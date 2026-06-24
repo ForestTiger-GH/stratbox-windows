@@ -1,0 +1,2 @@
+from stratbox_windows.application.operations.catalog.models import OperationSpec, OperationRegistry
+from stratbox_windows.application.operations.catalog.registry import build_operation_registry

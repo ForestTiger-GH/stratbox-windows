@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+*.so
+*.egg-info/
+dist/
+build/
+
+# Virtual env
+.venv/
+.venv-build/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets / env
+*.env
+filestore.env
+stratbox.env
+
+# Runtime log files
+*.log
+
+# Runtime/generated log directories only
+/appdock-system/logs/
+/stratbox-system/logs/
+/data/**/logs/
+
+# Never ignore source-code package
+!src/stratbox_windows/application/logs/
+!src/stratbox_windows/application/logs/**
