@@ -16,6 +16,9 @@ dependencies = [
 plugin = [
   "stratbox-plugin>=0.2.1",
 ]
+test = [
+  "pytest>=8.0",
+]
 
 [project.scripts]
 stratbox-windows = "stratbox_windows.__main__:main"
@@ -32,3 +35,10 @@ include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-ra"

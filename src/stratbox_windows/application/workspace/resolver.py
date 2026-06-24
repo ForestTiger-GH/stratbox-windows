@@ -94,6 +94,10 @@ def resolve_workspace_root(
         exists = workspace_root_path.exists()
         created = exists
 
+    if exists and create_missing and schema.auto_create_required_dirs:
+        for required_dir in schema.required_dirs:
+            (workspace_root_path / required_dir).mkdir(parents=True, exist_ok=True)
+
     available = exists and workspace_root_path.is_dir()
     writable = None
     if available:

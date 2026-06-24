@@ -39,3 +39,22 @@ python -m stratbox_windows --standalone-dev-root ./.tmp/dev-workspace --diagnose
 `appdock/manifest.json` объявляет primary desktop surface `stratbox_windows.desktop`.
 
 `appdock/preset.json` дополнительно включает bundled runtime dependency `stratbox-core`, которая должна materialize-иться и ставиться в managed environment AppDock.
+
+
+## Документация
+
+- `docs/architecture.md` — архитектурная карта репозитория и границы слоёв.
+- `docs/development.md` — локальная разработка, установка зависимостей и проверка запуска.
+- `docs/appdock-integration.md` — связка с AppDock и bundled runtime dependency `stratbox`.
+
+## Минимальные проверки
+
+Репозиторий содержит минимальный test/smoke-контур и проверки структуры:
+
+```bash
+python scripts/check_release_integrity.py
+python scripts/check_internal_imports.py
+python -m pytest
+```
+
+Для smoke-проверок, связанных с core, в окружении должен быть доступен пакет `stratbox`.

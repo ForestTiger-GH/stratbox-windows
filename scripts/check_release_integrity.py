@@ -5,6 +5,17 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_FILES = [
+    'README.md',
+    'pyproject.toml',
+    'appdock/manifest.json',
+    'appdock/preset.json',
+    'docs/architecture.md',
+    'docs/development.md',
+    'docs/appdock-integration.md',
+    '.github/workflows/ci.yml',
+    'tests/contracts/test_runtime_contracts.py',
+    'tests/smoke/test_external_core_dependency.py',
+    'tests/unit/test_paths.py',
     'src/stratbox_windows/application/logs/__init__.py',
     'src/stratbox_windows/application/logs/models.py',
     'src/stratbox_windows/application/logs/store.py',
@@ -19,6 +30,7 @@ REQUIRED_FILES = [
 CHECK_IGNORE_PATHS = [
     'src/stratbox_windows/application/logs/models.py',
     'src/stratbox_windows/application/history/persistence.py',
+    'tests/contracts/test_runtime_contracts.py',
 ]
 
 
