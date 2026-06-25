@@ -31,6 +31,8 @@ include-package-data = true
   "resources/workspace/*.json",
   "resources/styles/*.qss",
   "resources/images/*",
+  "resources/icons/*.svg",
+  "resources/icons/modes/*.svg",
 ]
 
 [tool.setuptools.packages.find]

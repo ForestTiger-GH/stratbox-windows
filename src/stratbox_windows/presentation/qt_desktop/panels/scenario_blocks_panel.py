@@ -15,10 +15,10 @@ class ScenarioBlocksPanel(QWidget):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(18, 18, 14, 18)
         layout.setSpacing(12)
-        title = QLabel('Сценарные блоки')
+        title = QLabel('Каскады сценариев')
         title.setObjectName('leftPanelTitle')
         layout.addWidget(title)
-        hint = QLabel('Составные сценарии из нескольких операций. Это будущая основная форма работы.')
+        hint = QLabel('Составные сценарии из нескольких шагов. Это основная форма для больших рабочих каскадов.')
         hint.setObjectName('leftPanelHint')
         hint.setWordWrap(True)
         layout.addWidget(hint)
@@ -34,7 +34,6 @@ class ScenarioBlocksPanel(QWidget):
             if scenario.kind != 'composite':
                 continue
             item = QListWidgetItem(f'{scenario.title}\n{len(scenario.steps)} шаг(ов)')
-            item.setData(Qt.UserRole, scenario.id)
             item.setToolTip(scenario.description)
             self.list.addItem(item)
 

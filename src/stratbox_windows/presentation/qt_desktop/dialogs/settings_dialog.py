@@ -46,8 +46,8 @@ class SettingsDialog(QDialog):
         self.mode_box = QComboBox()
         modes = [
             ('workspace', 'Проводник'),
-            ('atomic_scenarios', 'Отдельные сценарии'),
-            ('scenario_blocks', 'Сценарные блоки'),
+            ('atomic_scenarios', 'Сценарии'),
+            ('scenario_blocks', 'Каскады сценариев'),
             ('background', 'Фоновые процессы'),
             ('people', 'Участники'),
             ('assignments', 'Поручения'),
@@ -61,7 +61,7 @@ class SettingsDialog(QDialog):
         layout.addWidget(self.mode_box)
         layout.addWidget(QLabel('Стартовая вкладка правой панели'))
         self.tab_box = QComboBox()
-        for value, label in [('case', 'Кейс'), ('logs', 'Логи'), ('artifacts', 'Артефакты'), ('parameters', 'Параметры'), ('node', 'Узел')]:
+        for value, label in [('case', 'Кейс'), ('logs', 'Логи'), ('artifacts', 'Артефакты'), ('parameters', 'Параметры')]:
             self.tab_box.addItem(label, value)
         self.tab_box.setCurrentIndex(max(0, self.tab_box.findData(self._runtime.context.user_config.shell.right_inspector_tab)))
         self.tab_box.currentIndexChanged.connect(lambda _: self._runtime.preferences.save(right_inspector_tab=str(self.tab_box.currentData())))

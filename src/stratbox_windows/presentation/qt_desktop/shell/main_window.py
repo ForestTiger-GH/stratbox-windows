@@ -7,11 +7,11 @@ from stratbox_windows.application.assignments.models import AssignmentRecord
 from stratbox_windows.application.events.models import OperationalEvent
 from stratbox_windows.application.system.commands import build_diagnostics_text
 from stratbox_windows.runtime.bootstrap import AppRuntime
+from stratbox_windows.presentation.qt_desktop.dialogs.diagnostics_dialog import DiagnosticsDialog
+from stratbox_windows.presentation.qt_desktop.dialogs.node_dialog import NodeDialog
+from stratbox_windows.presentation.qt_desktop.dialogs.settings_dialog import SettingsDialog
 from .body import ShellBodyWidget
 from .mode_rail import ShellMode
-from .top_bar import TopBar
-from stratbox_windows.presentation.qt_desktop.dialogs.diagnostics_dialog import DiagnosticsDialog
-from stratbox_windows.presentation.qt_desktop.dialogs.settings_dialog import SettingsDialog
 
 
 class MainWindow(QMainWindow):
@@ -33,16 +33,16 @@ class MainWindow(QMainWindow):
         outer = QVBoxLayout(root)
         outer.setContentsMargins(0, 0, 0, 0)
         outer.setSpacing(0)
-        self.top_bar = TopBar(self.runtime)
         self.body = ShellBodyWidget(self.runtime)
-        outer.addWidget(self.top_bar)
         outer.addWidget(self.body, 1)
 
     def _connect_runtime(self) -> None:
-        self.top_bar.diagnostics_requested.connect(self._show_diagnostics)
-        self.top_bar.settings_requested.connect(self._show_settings)
-        self.top_bar.refresh_requested.connect(self._refresh_context_views)
-        self.top_bar.exit_requested.connect(self.close)
+        self.body.top_bar.filter_changed.connect(self.body.center_panel.set_filter_mode)
+        self.body.top_bar.diagnostics_requested.connect(self._show_diagnostics)
+        self.body.top_bar.settings_requested.connect(self._show_settings)
+        self.body.top_bar.refresh_requested.connect(self._refresh_context_views)
+        self.body.top_bar.node_requested.connect(self._show_node_dialog)
+        self.body.top_bar.exit_requested.connect(self.close)
         self.body.mode_rail.mode_changed.connect(self._set_mode)
         self.body.left_panel.scenario_selected.connect(self._select_scenario)
         self.body.left_panel.path_open_requested.connect(self.runtime.platform.open_path)
@@ -53,10 +53,10 @@ class MainWindow(QMainWindow):
         self.body.left_panel.assignment_case_selected.connect(self._select_case)
         self.body.center_panel.run_requested.connect(self._run_selected_scenario)
         self.body.center_panel.parameters_requested.connect(lambda: self.body.open_right_drawer('parameters'))
+        self.body.center_panel.details_requested.connect(self.body.toggle_right_drawer)
         self.body.center_panel.artifact_open_requested.connect(self.runtime.platform.open_path)
         self.body.center_panel.case_selected.connect(self._select_case)
         self.body.center_panel.background_process_selected.connect(self._show_background_process)
-        self.body.center_panel.filter_changed.connect(lambda *_: self._refresh_context_views())
         self.body.right_drawer.params_changed.connect(self._on_params_changed)
         self.runtime.scenario_coordinator.case_created.connect(self._on_case_created)
         self.runtime.scenario_coordinator.case_updated.connect(lambda *_: self._refresh_context_views())
@@ -72,7 +72,7 @@ class MainWindow(QMainWindow):
         elif runtime_state and runtime_state.last_operation_title:
             body = f'Последняя операция: {runtime_state.last_operation_title}'
         else:
-            body = 'Выберите сценарий слева или откройте проводник. Правая панель содержит кейс, логи, артефакты, параметры и состояние узла.'
+            body = 'Выберите сценарий слева или откройте проводник. Правая панель содержит кейс, логи, артефакты и параметры. Узел доступен из меню пользователя.'
         if not self.runtime.event_store.all():
             self.runtime.event_store.add(OperationalEvent.create(
                 kind='system_notice',
@@ -272,7 +272,7 @@ class MainWindow(QMainWindow):
 
     def _refresh_context_views(self) -> None:
         self.runtime.presence_service.mark_refreshed()
-        self.top_bar.refresh_context()
+        self.body.top_bar.refresh_context()
         self.body.center_panel.refresh()
         self.body.right_drawer.refresh()
         self.body.left_panel.refresh()
@@ -283,6 +283,9 @@ class MainWindow(QMainWindow):
     def _show_settings(self) -> None:
         SettingsDialog(self.runtime, self).exec()
         self._refresh_context_views()
+
+    def _show_node_dialog(self) -> None:
+        NodeDialog(self.runtime, self).exec()
 
     def closeEvent(self, event: QCloseEvent) -> None:
         self.runtime.preferences.save(width=self.width(), height=self.height())

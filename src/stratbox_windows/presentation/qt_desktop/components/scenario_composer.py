@@ -9,6 +9,7 @@ from stratbox_windows.application.scenarios.models import ScenarioSpec
 class BottomScenarioComposer(QFrame):
     run_requested = Signal()
     parameters_requested = Signal()
+    details_requested = Signal()
 
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
@@ -31,6 +32,10 @@ class BottomScenarioComposer(QFrame):
         self.params_button.setObjectName('secondaryActionButton')
         self.params_button.clicked.connect(self.parameters_requested.emit)
         layout.addWidget(self.params_button, 0, Qt.AlignVCenter)
+        self.details_button = QPushButton('Детали')
+        self.details_button.setObjectName('secondaryActionButton')
+        self.details_button.clicked.connect(self.details_requested.emit)
+        layout.addWidget(self.details_button, 0, Qt.AlignVCenter)
         self.run_button = QPushButton('Запустить')
         self.run_button.setObjectName('primaryRunButton')
         self.run_button.clicked.connect(self.run_requested.emit)
@@ -53,3 +58,4 @@ class BottomScenarioComposer(QFrame):
     def set_busy(self, busy: bool) -> None:
         self.run_button.setEnabled(not busy)
         self.params_button.setEnabled(not busy)
+        self.details_button.setEnabled(not busy)

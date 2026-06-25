@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from PySide6.QtCore import Signal
-from PySide6.QtWidgets import QHBoxLayout, QPushButton
 
 from stratbox_windows.application.events.models import OperationalEvent
 from stratbox_windows.presentation.qt_desktop.chat_scene import ChatSceneHost
@@ -19,9 +18,9 @@ def _chat_background_image_path():
 
 
 class CenterScenarioPanel(ChatSceneHost):
-    filter_changed = Signal(str)
     run_requested = Signal()
     parameters_requested = Signal()
+    details_requested = Signal()
     artifact_open_requested = Signal(str)
     case_selected = Signal(str)
     background_process_selected = Signal(str)
@@ -31,18 +30,6 @@ class CenterScenarioPanel(ChatSceneHost):
         self.setObjectName('centerPanel')
         self._runtime = runtime
         self._filter_mode = runtime.context.user_config.chat.filter_mode
-        self.filter_buttons: dict[str, QPushButton] = {}
-        filters = QHBoxLayout()
-        filters.setSpacing(8)
-        for mode, title in [('all', 'Все'), ('mine', 'Мои'), ('running', 'В работе'), ('success', 'Успешные'), ('errors', 'Ошибки'), ('unread', 'Непрочитанные')]:
-            button = QPushButton(title)
-            button.setCheckable(True)
-            button.setObjectName('scenarioFilterPill')
-            button.clicked.connect(lambda checked=False, value=mode: self.set_filter_mode(value, emit=True))
-            self.filter_buttons[mode] = button
-            filters.addWidget(button)
-        filters.addStretch(1)
-        self.content_layout.addLayout(filters)
         self.background_strip = ActiveBackgroundStrip(runtime.background_store)
         self.background_strip.process_selected.connect(self.background_process_selected.emit)
         self.content_layout.addWidget(self.background_strip)
@@ -53,20 +40,15 @@ class CenterScenarioPanel(ChatSceneHost):
         self.composer = BottomScenarioComposer()
         self.composer.run_requested.connect(self.run_requested.emit)
         self.composer.parameters_requested.connect(self.parameters_requested.emit)
+        self.composer.details_requested.connect(self.details_requested.emit)
         self.content_layout.addWidget(self.composer)
-        self.set_filter_mode(self._filter_mode)
         self.refresh()
 
-    def set_filter_mode(self, mode: str, *, emit: bool = False) -> None:
+    def current_filter_mode(self) -> str:
+        return self._filter_mode
+
+    def set_filter_mode(self, mode: str) -> None:
         self._filter_mode = mode
-        for key, button in self.filter_buttons.items():
-            active = key == mode
-            button.setChecked(active)
-            button.setProperty('active', active)
-            button.style().unpolish(button)
-            button.style().polish(button)
-        if emit:
-            self.filter_changed.emit(mode)
         self.refresh()
 
     def set_scenario(self, scenario, params_summary: str = '') -> None:

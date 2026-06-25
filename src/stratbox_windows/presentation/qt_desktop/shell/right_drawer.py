@@ -7,7 +7,6 @@ from stratbox_windows.runtime.bootstrap import AppRuntime
 from stratbox_windows.presentation.qt_desktop.panels.artifacts_panel import ArtifactsPanel
 from stratbox_windows.presentation.qt_desktop.panels.case_panel import CasePanel
 from stratbox_windows.presentation.qt_desktop.panels.logs_panel import LogsPanel
-from stratbox_windows.presentation.qt_desktop.panels.node_overview_panel import NodeOverviewPanel
 from stratbox_windows.presentation.qt_desktop.panels.parameters_panel import ScenarioParametersPanel
 
 
@@ -32,9 +31,9 @@ class RightInspectorDrawer(QFrame):
         title.setObjectName('rightInspectorTitle')
         header.addWidget(title)
         header.addStretch(1)
-        close = QPushButton('→')
+        close = QPushButton('✕')
         close.setObjectName('rightInspectorCloseButton')
-        close.setToolTip('Свернуть панель')
+        close.setToolTip('Скрыть панель')
         close.clicked.connect(self.close_requested.emit)
         header.addWidget(close)
         layout.addLayout(header)
@@ -47,7 +46,6 @@ class RightInspectorDrawer(QFrame):
             ('logs', 'Логи'),
             ('artifacts', 'Артефакты'),
             ('parameters', 'Параметры'),
-            ('node', 'Узел'),
         ):
             button = QPushButton(label)
             button.setCheckable(True)
@@ -67,7 +65,6 @@ class RightInspectorDrawer(QFrame):
         self.logs_panel = LogsPanel(runtime.log_store, runtime.platform)
         self.artifacts_panel = ArtifactsPanel(runtime.artifact_store, runtime.platform)
         self.parameters_panel = ScenarioParametersPanel(preferences=runtime.preferences)
-        self.node_panel = NodeOverviewPanel(runtime)
         self.parameters_panel.params_changed.connect(self.params_changed.emit)
         self.parameters_panel.submitted.connect(self.submitted.emit)
         self._panels = {
@@ -75,7 +72,6 @@ class RightInspectorDrawer(QFrame):
             'logs': self.logs_panel,
             'artifacts': self.artifacts_panel,
             'parameters': self.parameters_panel,
-            'node': self.node_panel,
         }
         for panel in self._panels.values():
             self.stack.addWidget(panel)
@@ -117,4 +113,3 @@ class RightInspectorDrawer(QFrame):
         self.case_panel.refresh()
         self.logs_panel.refresh()
         self.artifacts_panel.refresh()
-        self.node_panel.refresh()

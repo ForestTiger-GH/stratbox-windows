@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-from PySide6.QtCore import Signal
+from pathlib import Path
+
+from PySide6.QtCore import QSize, Qt, Signal
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QFrame, QPushButton, QVBoxLayout
 
 
@@ -17,36 +20,55 @@ class ModeRail(QFrame):
     mode_changed = Signal(str)
 
     _ITEMS = (
-        (ShellMode.WORKSPACE, '📁', 'Проводник'),
-        (ShellMode.ATOMIC_SCENARIOS, '⚙', 'Отдельные сценарии'),
-        (ShellMode.SCENARIO_BLOCKS, '🧩', 'Сценарные блоки'),
-        (ShellMode.BACKGROUND, '◷', 'Фоновые процессы'),
-        (ShellMode.PEOPLE, '👥', 'Участники'),
-        (ShellMode.ASSIGNMENTS, '✓', 'Поручения'),
+        (ShellMode.WORKSPACE, 'workspace.svg', 'workspace_active.svg', 'Проводник', 'W'),
+        (ShellMode.ATOMIC_SCENARIOS, 'scenarios.svg', 'scenarios_active.svg', 'Сценарии', 'S'),
+        (ShellMode.SCENARIO_BLOCKS, 'cascades.svg', 'cascades_active.svg', 'Каскады сценариев', 'C'),
+        (ShellMode.BACKGROUND, 'background.svg', 'background_active.svg', 'Фоновые процессы', 'B'),
+        (ShellMode.PEOPLE, 'people.svg', 'people_active.svg', 'Участники', 'P'),
+        (ShellMode.ASSIGNMENTS, 'assignments.svg', 'assignments_active.svg', 'Поручения', 'T'),
     )
 
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
         self.setObjectName('modeRail')
+        self.setFixedWidth(60)
         self._buttons: dict[str, QPushButton] = {}
+        self._icons: dict[str, tuple[QIcon | None, QIcon | None]] = {}
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(8, 16, 8, 16)
-        layout.setSpacing(10)
-        for mode, icon, tooltip in self._ITEMS:
-            button = QPushButton(icon)
+        layout.setContentsMargins(4, 12, 4, 12)
+        layout.setSpacing(6)
+        icons_root = Path(__file__).resolve().parents[3] / 'resources' / 'icons' / 'modes'
+        for mode, icon_name, active_icon_name, tooltip, fallback in self._ITEMS:
+            button = QPushButton(self)
             button.setObjectName('modeRailButton')
             button.setCheckable(True)
-            button.setFixedSize(44, 44)
             button.setToolTip(tooltip)
+            button.setFixedSize(52, 52)
+            button.setIconSize(QSize(20, 20))
+            icon_path = icons_root / icon_name
+            active_icon_path = icons_root / active_icon_name
+            normal_icon = QIcon(str(icon_path)) if icon_path.exists() else None
+            active_icon = QIcon(str(active_icon_path)) if active_icon_path.exists() else normal_icon
+            self._icons[mode] = (normal_icon, active_icon)
+            if normal_icon is not None:
+                button.setIcon(normal_icon)
+                button.setText('')
+            else:
+                button.setText(fallback)
             button.clicked.connect(lambda checked=False, value=mode: self.set_mode(value, emit=True))
             self._buttons[mode] = button
-            layout.addWidget(button)
+            layout.addWidget(button, 0, Qt.AlignHCenter)
         layout.addStretch(1)
 
     def set_mode(self, mode: str, *, emit: bool = False) -> None:
         for key, button in self._buttons.items():
-            button.setChecked(key == mode)
-            button.setProperty('active', key == mode)
+            active = key == mode
+            button.setChecked(active)
+            button.setProperty('active', active)
+            normal_icon, active_icon = self._icons.get(key, (None, None))
+            if normal_icon is not None:
+                button.setIcon(active_icon if active else normal_icon)
+                button.setText('')
             button.style().unpolish(button)
             button.style().polish(button)
         if emit:
