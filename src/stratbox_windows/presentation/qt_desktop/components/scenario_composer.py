@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QFrame, QGridLayout, QHBoxLayout, QLabel, QPushButton, QVBoxLayout
 
 from stratbox_windows.application.scenarios.models import ScenarioSpec
 
@@ -10,79 +10,122 @@ class BottomScenarioComposer(QFrame):
     run_requested = Signal()
     details_requested = Signal()
 
-    _DETAILS_SLOT_WIDTH = 60
-
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
         self.setObjectName('bottomScenarioComposer')
 
+        self._scenario_available = False
+        self._busy = False
+
         outer = QHBoxLayout(self)
-        outer.setContentsMargins(24, 4, 24, 6)
+        outer.setContentsMargins(24, 4, 24, 10)
         outer.setSpacing(0)
         outer.addStretch(1)
 
-        self.launch_group = QWidget(self)
-        self.launch_group.setObjectName('bottomScenarioComposerGroup')
-        group_layout = QHBoxLayout(self.launch_group)
-        group_layout.setContentsMargins(0, 0, 0, 0)
-        group_layout.setSpacing(12)
-
-        self.left_reserve = QWidget(self.launch_group)
-        self.left_reserve.setObjectName('bottomScenarioComposerReserve')
-        self.left_reserve.setFixedWidth(self._DETAILS_SLOT_WIDTH)
-        group_layout.addWidget(self.left_reserve)
-
-        self.launch_card = QFrame(self.launch_group)
+        self.launch_card = QFrame(self)
         self.launch_card.setObjectName('scenarioLaunchCard')
-        self.launch_card.setMaximumWidth(720)
-        card_layout = QHBoxLayout(self.launch_card)
-        card_layout.setContentsMargins(18, 14, 18, 14)
-        card_layout.setSpacing(18)
+        self.launch_card.setMaximumWidth(760)
+        self.launch_card.setMinimumWidth(560)
+        card_layout = QGridLayout(self.launch_card)
+        card_layout.setContentsMargins(22, 18, 18, 16)
+        card_layout.setHorizontalSpacing(16)
+        card_layout.setVerticalSpacing(8)
+        card_layout.setColumnStretch(0, 1)
+        card_layout.setColumnStretch(1, 0)
 
         text_col = QVBoxLayout()
-        text_col.setSpacing(3)
+        text_col.setContentsMargins(0, 0, 0, 0)
+        text_col.setSpacing(6)
+
         self.title = QLabel('Сценарий не выбран')
         self.title.setObjectName('composerOperationTitle')
         self.title.setWordWrap(True)
-        self.summary = QLabel('Выберите сценарий слева или откройте проводник.')
-        self.summary.setObjectName('composerPlaceholder')
-        self.summary.setWordWrap(True)
         text_col.addWidget(self.title)
+
+        self.summary = QLabel('Выберите сценарий слева или откройте проводник.')
+        self.summary.setObjectName('composerScenarioSummary')
+        self.summary.setWordWrap(True)
         text_col.addWidget(self.summary)
-        card_layout.addLayout(text_col, 1)
-        card_layout.addStretch(1)
 
-        self.run_button = QPushButton('Запустить')
-        self.run_button.setObjectName('primaryRunButton')
-        self.run_button.clicked.connect(self.run_requested.emit)
-        card_layout.addWidget(self.run_button, 0, Qt.AlignVCenter)
+        self.meta = QLabel('После выбора сценария здесь появится краткая сводка запуска.')
+        self.meta.setObjectName('composerScenarioMeta')
+        self.meta.setWordWrap(True)
+        text_col.addWidget(self.meta)
 
-        group_layout.addWidget(self.launch_card, 0, Qt.AlignVCenter)
+        card_layout.addLayout(text_col, 0, 0, 2, 1)
+
+        self.actions_host = QHBoxLayout()
+        self.actions_host.setContentsMargins(0, 0, 0, 0)
+        self.actions_host.setSpacing(10)
+        self.actions_host.addStretch(1)
 
         self.details_button = QPushButton('☰')
         self.details_button.setObjectName('detailsToggleButton')
         self.details_button.setToolTip('Показать или скрыть детали')
-        self.details_button.setFixedSize(48, 48)
+        self.details_button.setCursor(Qt.PointingHandCursor)
+        self.details_button.setFixedSize(46, 46)
         self.details_button.clicked.connect(self.details_requested.emit)
-        group_layout.addWidget(self.details_button, 0, Qt.AlignVCenter)
+        self.actions_host.addWidget(self.details_button)
 
-        outer.addWidget(self.launch_group, 0, Qt.AlignHCenter)
+        self.run_button = QPushButton('→')
+        self.run_button.setObjectName('primaryRunButton')
+        self.run_button.setToolTip('Запустить сценарий')
+        self.run_button.setCursor(Qt.PointingHandCursor)
+        self.run_button.setFixedSize(46, 46)
+        self.run_button.clicked.connect(self.run_requested.emit)
+        self.actions_host.addWidget(self.run_button)
+
+        card_layout.addLayout(self.actions_host, 1, 1, 1, 1, Qt.AlignRight | Qt.AlignBottom)
+
+        outer.addWidget(self.launch_card, 0, Qt.AlignHCenter)
         outer.addStretch(1)
+
+    @staticmethod
+    def _compact_params_text(params_summary: str) -> str:
+        if not params_summary:
+            return 'Параметры по умолчанию'
+        normalized = params_summary.strip()
+        if not normalized:
+            return 'Параметры по умолчанию'
+        if normalized == 'параметры по умолчанию':
+            return 'Параметры по умолчанию'
+        parts = [part.strip() for part in normalized.split(',') if part.strip()]
+        if not parts:
+            return 'Параметры по умолчанию'
+        visible = parts[:2]
+        suffix = ' · …' if len(parts) > 2 else ''
+        compact = ' · '.join(visible) + suffix
+        if len(compact) > 110:
+            compact = compact[:109].rstrip() + '…'
+        return compact
 
     def set_scenario(self, scenario: ScenarioSpec | None, params_summary: str = '') -> None:
         if scenario is None:
             self.title.setText('Сценарий не выбран')
             self.summary.setText('Выберите сценарий слева или откройте проводник.')
-            self.run_button.setText('Запустить')
-            self.run_button.setEnabled(False)
+            self.meta.setText('После выбора сценария здесь появится краткая сводка запуска.')
+            self.run_button.setToolTip('Запустить сценарий')
+            self._scenario_available = False
+            self._apply_enabled_state()
             return
-        self.title.setText(scenario.title)
+
         steps_count = len(scenario.steps)
-        params_hint = params_summary or 'параметры по умолчанию'
-        self.summary.setText(f'{steps_count} шаг(ов) · {params_hint}')
-        self.run_button.setText(scenario.submit_label)
-        self.run_button.setEnabled(True)
+        steps_label = f'{steps_count} шаг' if steps_count == 1 else f'{steps_count} шаг(ов)'
+        summary_text = (scenario.description or 'Сценарий готов к запуску.').strip()
+        if len(summary_text) > 150:
+            summary_text = summary_text[:149].rstrip() + '…'
+        self.title.setText(scenario.title)
+        self.summary.setText(summary_text)
+        self.meta.setText(f'{steps_label} · {self._compact_params_text(params_summary)}')
+        self.run_button.setToolTip(scenario.submit_label or 'Запустить сценарий')
+        self._scenario_available = True
+        self._apply_enabled_state()
 
     def set_busy(self, busy: bool) -> None:
-        self.run_button.setEnabled(not busy)
-        self.details_button.setEnabled(not busy)
+        self._busy = busy
+        self._apply_enabled_state()
+
+    def _apply_enabled_state(self) -> None:
+        enabled = self._scenario_available and not self._busy
+        self.run_button.setEnabled(enabled)
+        self.details_button.setEnabled(enabled)

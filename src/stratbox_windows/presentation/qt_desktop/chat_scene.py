@@ -87,7 +87,7 @@ class ChatSceneHost(QWidget):
         self.overlay_top_layout.setContentsMargins(0, 0, 0, 0)
         self.overlay_top_layout.setSpacing(0)
         self.overlay_layout.addWidget(self.overlay_top)
-        self.overlay_layout.addStretch(1)
+        self._overlay_height = 0
 
         self._sync_layers()
 
@@ -101,5 +101,14 @@ class ChatSceneHost(QWidget):
         self.content.setGeometry(rect)
         self.background.lower()
         self.content.raise_()
-        self.overlay.setGeometry(rect)
+        overlay_height = self._measure_overlay_height()
+        self.overlay.setGeometry(0, 0, rect.width(), overlay_height)
         self.overlay.raise_()
+        self._overlay_height = overlay_height
+
+    def _measure_overlay_height(self) -> int:
+        margins = self.overlay_layout.contentsMargins()
+        top_height = self.overlay_top.sizeHint().height()
+        if top_height <= 0:
+            top_height = 52
+        return margins.top() + top_height + margins.bottom()

@@ -32,7 +32,7 @@ QMainWindow {
 #leftShellBrandTitle {
     background: transparent;
     font-size: 18px;
-    font-weight: 400;
+    font-weight: 700;
     color: #111827;
 }
 
@@ -50,6 +50,8 @@ QMainWindow {
 #topBarSubtle,
 #leftPanelHint,
 #composerPlaceholder,
+#composerScenarioSummary,
+#composerScenarioMeta,
 #chatMeta {
     color: #6B7280;
     font-size: 12px;
@@ -166,12 +168,18 @@ QMainWindow {
 }
 
 #primaryRunButton {
-    border: 1px solid #0F6F78;
-    border-radius: 16px;
+    min-width: 46px;
+    max-width: 46px;
+    min-height: 46px;
+    max-height: 46px;
+    border: none;
+    border-radius: 23px;
     background: #0F6F78;
     color: #FFFFFF;
-    padding: 10px 16px;
+    padding: 0;
+    font-size: 24px;
     font-weight: 700;
+    text-align: center;
 }
 
 #primaryRunButton:hover {
@@ -179,36 +187,48 @@ QMainWindow {
 }
 
 #primaryRunButton:disabled {
-    background: #E5ECF2;
-    border-color: #E5ECF2;
-    color: #94A3B8;
+    background: #D8E5E7;
+    color: #FFFFFF;
 }
 
 #detailsToggleButton {
-    border: 1px solid #D99134;
-    border-radius: 14px;
+    min-width: 46px;
+    max-width: 46px;
+    min-height: 46px;
+    max-height: 46px;
+    border: none;
+    border-radius: 23px;
     background: #E99A36;
     color: #FFFFFF;
     padding: 0;
     font-size: 18px;
     font-weight: 700;
+    text-align: center;
 }
 
 #detailsToggleButton:hover {
     background: #D88B29;
-    border-color: #C77E1E;
 }
 
 #detailsToggleButton:disabled {
-    background: #E7D5BD;
-    border-color: #E7D5BD;
+    background: #EAD7BE;
     color: #FFF6EB;
 }
 
 #composerOperationTitle {
-    font-size: 15px;
+    font-size: 18px;
     font-weight: 700;
     color: #111827;
+}
+
+#composerScenarioSummary {
+    color: #334155;
+    font-size: 13px;
+}
+
+#composerScenarioMeta {
+    color: #64748B;
+    font-size: 12px;
 }
 
 #rightInspectorDrawer {

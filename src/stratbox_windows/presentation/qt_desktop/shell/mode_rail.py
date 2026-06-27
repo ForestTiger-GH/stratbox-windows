@@ -35,7 +35,7 @@ class ModeRail(QFrame):
         self._buttons: dict[str, QPushButton] = {}
         self._icons: dict[str, tuple[QIcon | None, QIcon | None]] = {}
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(0, 10, 0, 10)
+        layout.setContentsMargins(0, 0, 0, 10)
         layout.setSpacing(0)
         icons_root = Path(__file__).resolve().parents[3] / 'resources' / 'icons' / 'modes'
         for mode, icon_name, active_icon_name, tooltip, fallback in self._ITEMS:
@@ -44,7 +44,7 @@ class ModeRail(QFrame):
             button.setCheckable(True)
             button.setToolTip(tooltip)
             button.setFixedSize(96, 96)
-            button.setIconSize(QSize(32, 32))
+            button.setIconSize(QSize(64, 64))
             icon_path = icons_root / icon_name
             active_icon_path = icons_root / active_icon_name
             normal_icon = QIcon(str(icon_path)) if icon_path.exists() else None

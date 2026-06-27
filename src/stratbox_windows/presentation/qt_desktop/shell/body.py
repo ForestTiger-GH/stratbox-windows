@@ -16,7 +16,7 @@ class ShellBodyWidget(QWidget):
         self.setObjectName('shellRoot')
         self.runtime = runtime
         self.drawer_width = runtime.context.user_config.shell.right_inspector_width
-        self._drawer_progress = 1.0 if runtime.context.user_config.shell.right_inspector_open else 0.0
+        self._drawer_progress = 0.0
 
         root = QHBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
