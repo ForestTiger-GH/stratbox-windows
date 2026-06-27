@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from PySide6.QtCore import Signal
-from PySide6.QtWidgets import QHBoxLayout, QLabel, QPushButton, QWidget
+from PySide6.QtWidgets import QHBoxLayout, QPushButton, QWidget
 
 from stratbox_windows.application.background.store import BackgroundProcessStore
 
@@ -25,10 +25,9 @@ class ActiveBackgroundStrip(QWidget):
             if widget is not None:
                 widget.deleteLater()
         active = self._store.enabled_states()
+        self.setVisible(bool(active))
         if not active:
-            label = QLabel('Фоновые процессы не включены')
-            label.setObjectName('chatMeta')
-            self._layout.addWidget(label)
+            return
         for state in active:
             spec = self._store.spec(state.process_id)
             button = QPushButton(f'● {spec.title} · {state.status_label}')

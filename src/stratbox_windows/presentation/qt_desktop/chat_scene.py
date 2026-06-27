@@ -16,10 +16,10 @@ class ChatBackgroundWidget(QWidget):
     aspect ratio.
     """
 
-    def __init__(self, image_path: Path, parent: QWidget | None = None) -> None:
+    def __init__(self, image_path: Path | None, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self._image_path = image_path
-        self._source = QPixmap(str(image_path)) if image_path.exists() else QPixmap()
+        self._source = QPixmap(str(image_path)) if image_path and image_path.exists() else QPixmap()
         self._scaled = QPixmap()
         self.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         self.setAutoFillBackground(False)
@@ -31,7 +31,7 @@ class ChatBackgroundWidget(QWidget):
     def paintEvent(self, event) -> None:  # type: ignore[override]
         painter = QPainter(self)
         painter.setRenderHint(QPainter.SmoothPixmapTransform, True)
-        painter.fillRect(self.rect(), QColor('#ffffff'))
+        painter.fillRect(self.rect(), QColor('#F4F7FA'))
         if not self._scaled.isNull():
             x = (self.width() - self._scaled.width()) // 2
             y = (self.height() - self._scaled.height()) // 2
@@ -61,7 +61,7 @@ class ChatSceneHost(QWidget):
     background remains pinned and never participates in scrolling.
     """
 
-    def __init__(self, image_path: Path, parent: QWidget | None = None) -> None:
+    def __init__(self, image_path: Path | None, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self.setObjectName('centerSceneHost')
         self.setAutoFillBackground(False)

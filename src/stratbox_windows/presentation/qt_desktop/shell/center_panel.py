@@ -13,11 +13,6 @@ from stratbox_windows.presentation.qt_desktop.scenario_chat.widgets import Scena
 from stratbox_windows.runtime.bootstrap import AppRuntime
 
 
-def _chat_background_image_path():
-    from pathlib import Path
-    return Path(__file__).resolve().parents[3] / 'resources' / 'images' / 'chat_history_background.png'
-
-
 class CenterScenarioPanel(ChatSceneHost):
     run_requested = Signal()
     details_requested = Signal()
@@ -26,10 +21,11 @@ class CenterScenarioPanel(ChatSceneHost):
     background_process_selected = Signal(str)
 
     def __init__(self, runtime: AppRuntime, parent=None) -> None:
-        super().__init__(_chat_background_image_path(), parent)
+        super().__init__(None, parent)
         self.setObjectName('centerPanel')
         self._runtime = runtime
         self._filter_mode = runtime.context.user_config.chat.filter_mode
+        self._chat_context_key: tuple[str, str | None] | None = None
         self.top_bar = TopBar(runtime, self.overlay_top)
         self.overlay_top_layout.addWidget(self.top_bar, 1, Qt.AlignTop)
 
@@ -44,14 +40,14 @@ class CenterScenarioPanel(ChatSceneHost):
         self.composer.run_requested.connect(self.run_requested.emit)
         self.composer.details_requested.connect(self.details_requested.emit)
         self.content_layout.addWidget(self.composer)
-        self.refresh()
+        self.refresh(reset_view=True)
 
     def current_filter_mode(self) -> str:
         return self._filter_mode
 
     def set_filter_mode(self, mode: str) -> None:
         self._filter_mode = mode
-        self.refresh()
+        self.refresh(reset_view=True)
 
     def set_scenario(self, scenario, params_summary: str = '') -> None:
         self.composer.set_scenario(scenario, params_summary=params_summary)
@@ -59,19 +55,32 @@ class CenterScenarioPanel(ChatSceneHost):
     def set_busy(self, busy: bool) -> None:
         self.composer.set_busy(busy)
 
-    def refresh(self) -> None:
+    def refresh(self, *, reset_view: bool = False) -> None:
         self.background_strip.refresh()
         author_id = self._runtime.context.user_id if self._filter_mode == 'mine' else self._runtime.context.user_config.chat.selected_author_id
-        cases = self._runtime.case_store.visible(mode=self._filter_mode, author_id=author_id)
-        messages: list[ScenarioChatMessage] = [project_case(case, self._runtime.artifact_store) for case in cases]
+        context_key = (self._filter_mode, author_id)
+        reset_view = reset_view or self._chat_context_key != context_key
+        self._chat_context_key = context_key
+
+        messages: list[ScenarioChatMessage] = [
+            project_case(
+                case,
+                self._runtime.artifact_store,
+                current_user_id=self._runtime.context.user_id,
+            )
+            for case in self._runtime.case_store.visible(mode=self._filter_mode, author_id=author_id)
+        ]
         important_events = [
             event for event in self._runtime.event_store.recent(100)
             if event.kind in {'system_notice', 'background_notice', 'assignment_notice'}
             and self._event_visible_for_filter(event)
         ]
-        messages.extend(project_event(event) for event in important_events)
+        messages.extend(
+            project_event(event, current_user_id=self._runtime.context.user_id)
+            for event in important_events
+        )
         messages.sort(key=lambda item: item.sort_key)
-        self.chat.set_messages(tuple(messages))
+        self.chat.set_messages(tuple(messages), reset_view=reset_view)
 
     def _event_visible_for_filter(self, event: OperationalEvent) -> bool:
         if self._filter_mode == 'all':

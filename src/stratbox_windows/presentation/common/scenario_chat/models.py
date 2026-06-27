@@ -28,6 +28,13 @@ class ScenarioChatMessage:
     author_label: str
     timestamp_label: str
     sort_key: str
+    actor_kind: str = 'system'
+    actor_id: str = ''
+    placement: str = 'incoming'
+    avatar_text: str = 'SB'
+    avatar_palette_key: str = 'system'
+    message_family: str = 'notice'
+    unread: bool = False
     stage_label: str | None = None
     params_summary: str = ''
     steps: tuple[ScenarioStepLine, ...] = ()

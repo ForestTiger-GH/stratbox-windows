@@ -37,6 +37,9 @@ class PresenceService:
             accent_color=self.color_for_participant(participant_id),
         )
 
+    def avatar_palette_key_for_participant(self, participant_id: str | None) -> str:
+        return f'user:{participant_id or "unknown"}'
+
     def color_for_participant(self, participant_id: str | None) -> str:
         key = participant_id or 'unknown'
         idx = sum(ord(ch) for ch in key) % len(self._PALETTE)

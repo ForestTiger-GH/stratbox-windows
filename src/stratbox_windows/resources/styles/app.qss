@@ -121,7 +121,8 @@ QMainWindow {
 #centerSceneContent,
 #centerSceneBackground,
 #scenarioChatView,
-#scenarioChatView > QWidget {
+#scenarioChatView > QWidget,
+#scenarioChatHost {
     background: transparent;
     border: none;
 }
@@ -262,10 +263,38 @@ QMainWindow {
     color: #475569;
 }
 
+#activeBackgroundStrip {
+    background: transparent;
+    border: none;
+}
+
+#backgroundProcessChip {
+    border: 1px solid #DAE6EE;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 7px 12px;
+    color: #35535A;
+    font-weight: 600;
+}
+
+#backgroundProcessChip:hover {
+    background: #F8FBFC;
+}
+
+#scenarioMessageRow {
+    background: transparent;
+    border: none;
+}
+
 #scenarioCaseBubble {
-    border: 1px solid #E5ECF2;
+    border: 1px solid #DFE8EF;
     border-radius: 24px;
     background: rgba(255, 255, 255, 0.96);
+}
+
+#scenarioCaseBubble[placement="outgoing"] {
+    border-color: #CFE2E1;
+    background: rgba(239, 249, 249, 0.98);
 }
 
 #scenarioCaseBubble[tone="running"] {
@@ -273,9 +302,19 @@ QMainWindow {
     background: #F8FBFF;
 }
 
+#scenarioCaseBubble[tone="running"][placement="outgoing"] {
+    border-color: #BEDADE;
+    background: #F1FBFC;
+}
+
 #scenarioCaseBubble[tone="success"] {
     border-color: #CFEADB;
     background: #F8FCFA;
+}
+
+#scenarioCaseBubble[tone="success"][placement="outgoing"] {
+    border-color: #C9E4DE;
+    background: #F2FBF7;
 }
 
 #scenarioCaseBubble[tone="failed"],
@@ -285,9 +324,33 @@ QMainWindow {
 }
 
 #scenarioNoticeBubble {
-    border: 1px solid #EEF3F7;
+    border: 1px solid #E8EEF4;
     border-radius: 18px;
-    background: rgba(255, 255, 255, 0.86);
+    background: rgba(255, 255, 255, 0.9);
+}
+
+#scenarioNoticeBubble[placement="outgoing"] {
+    border-color: #D9E8E8;
+    background: rgba(243, 250, 250, 0.95);
+}
+
+#newMessagesButton {
+    min-width: 44px;
+    max-width: 44px;
+    min-height: 44px;
+    max-height: 44px;
+    border: 1px solid #D9E4EC;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.96);
+    color: #35535A;
+    font-size: 21px;
+    font-weight: 700;
+    padding: 0;
+}
+
+#newMessagesButton:hover {
+    background: #F8FBFC;
+    color: #0F6F78;
 }
 
 #chatMessageTitle {
@@ -300,6 +363,7 @@ QMainWindow {
 #chatStepLine {
     color: #111827;
     line-height: 1.45;
+    background: transparent;
 }
 
 #chatStage {
