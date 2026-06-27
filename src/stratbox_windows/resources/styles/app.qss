@@ -83,9 +83,9 @@ QMainWindow {
     border: none;
     border-radius: 0;
     background: transparent;
-    padding: 0;
+    padding: 8px 4px 6px 4px;
     color: #64748B;
-    font-size: 15px;
+    font-size: 11px;
     font-weight: 700;
     text-align: center;
 }
@@ -104,6 +104,50 @@ QMainWindow {
     font-size: 17px;
     font-weight: 700;
     color: #111827;
+}
+
+#workspaceMountHeader {
+    border: 1px solid #E1EAF1;
+    border-radius: 14px;
+    background: #F8FBFD;
+}
+
+#workspaceMountHeader[available="false"] {
+    border-color: #E6EDF3;
+    background: #FBFCFD;
+}
+
+#workspaceMountIconBadge {
+    min-width: 42px;
+    max-width: 42px;
+    min-height: 42px;
+    max-height: 42px;
+    border: 1px solid #D2E3F4;
+    border-radius: 12px;
+    background: #EAF3FB;
+}
+
+#workspaceMountHeader[available="false"] #workspaceMountIconBadge {
+    border-color: #E3E8EE;
+    background: #F2F5F8;
+}
+
+#workspaceMountIcon {
+    background: transparent;
+}
+
+#workspaceMountTitle {
+    background: transparent;
+    color: #0F172A;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+#workspaceMountPath {
+    background: transparent;
+    color: #64748B;
+    font-size: 12px;
+    font-weight: 600;
 }
 
 #sidebarSectionTitle,

@@ -3,9 +3,10 @@ from __future__ import annotations
 from pathlib import Path
 
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtWidgets import QLabel, QMenu, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QMenu, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget
 
 from stratbox_windows.application.workspace.explorer import build_workspace_explorer_sections
+from stratbox_windows.presentation.qt_desktop.components.workspace_mount_header import WorkspaceMountHeader
 from stratbox_windows.runtime.context import AppContext
 
 
@@ -20,13 +21,8 @@ class WorkspacePanel(QWidget):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(18, 18, 14, 18)
         layout.setSpacing(12)
-        title = QLabel('Проводник')
-        title.setObjectName('leftPanelTitle')
-        layout.addWidget(title)
-        hint = QLabel('Пользовательская рабочая среда: входные данные, результаты и связанные файлы сценариев.')
-        hint.setObjectName('leftPanelHint')
-        hint.setWordWrap(True)
-        layout.addWidget(hint)
+        self._mount_header = WorkspaceMountHeader(self)
+        layout.addWidget(self._mount_header)
         self.tree = QTreeWidget()
         self.tree.setHeaderHidden(True)
         self.tree.setObjectName('workspaceTree')
@@ -38,6 +34,7 @@ class WorkspacePanel(QWidget):
         self.refresh()
 
     def refresh(self) -> None:
+        self._refresh_mount_header()
         self.tree.clear()
         sections = build_workspace_explorer_sections(self._context)
         if not sections:
@@ -52,6 +49,23 @@ class WorkspacePanel(QWidget):
             if section.show_children:
                 self._populate_children(root_item, section.path)
             root_item.setExpanded(section.id in {'workspace_root', 'input', 'output'})
+
+    def _refresh_mount_header(self) -> None:
+        data_root_path = self._preferred_mount_path()
+        display_text = f'({str(data_root_path)})' if data_root_path else '(недоступно)'
+        status_text = self._context.data_root_status.message
+        self._mount_header.set_mount(
+            path_text=display_text,
+            available=bool(self._context.data_root_status.available and data_root_path is not None),
+            status_text=status_text,
+        )
+
+    def _preferred_mount_path(self) -> Path | None:
+        return (
+            self._context.data_root_status.path
+            or self._context.data_root_selector_path
+            or self._context.workspace_root_path
+        )
 
     def _populate_children(self, item: QTreeWidgetItem, path: Path) -> None:
         if not path.exists() or not path.is_dir():
