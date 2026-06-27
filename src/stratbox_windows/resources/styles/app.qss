@@ -16,7 +16,8 @@ QMainWindow {
 #leftShell,
 #leftShellHeader,
 #leftShellBody,
-#leftPanel {
+#leftPanel,
+#leftPanelSection {
     background: #FFFFFF;
 }
 
@@ -107,47 +108,69 @@ QMainWindow {
 }
 
 #workspaceMountHeader {
-    border: 1px solid #E1EAF1;
-    border-radius: 14px;
-    background: #F8FBFD;
-}
-
-#workspaceMountHeader[available="false"] {
-    border-color: #E6EDF3;
-    background: #FBFCFD;
-}
-
-#workspaceMountIconBadge {
-    min-width: 42px;
-    max-width: 42px;
-    min-height: 42px;
-    max-height: 42px;
-    border: 1px solid #D2E3F4;
-    border-radius: 12px;
-    background: #EAF3FB;
-}
-
-#workspaceMountHeader[available="false"] #workspaceMountIconBadge {
-    border-color: #E3E8EE;
-    background: #F2F5F8;
+    border: none;
+    background: transparent;
 }
 
 #workspaceMountIcon {
     background: transparent;
+    min-width: 16px;
+    max-width: 16px;
+    min-height: 16px;
+    max-height: 16px;
 }
 
-#workspaceMountTitle {
+#workspaceMountLine {
     background: transparent;
     color: #0F172A;
-    font-size: 15px;
-    font-weight: 700;
+    font-size: 13px;
+    font-weight: 600;
 }
 
-#workspaceMountPath {
+#workspaceMountHeader[available="false"] #workspaceMountLine {
+    color: #64748B;
+}
+
+#workspacePathBar {
+    background: transparent;
+    border: none;
+}
+
+#workspacePathUpButton {
+    min-width: 26px;
+    max-width: 26px;
+    min-height: 26px;
+    max-height: 26px;
+    border: 1px solid #E5ECF2;
+    border-radius: 9px;
+    background: #FFFFFF;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 0;
+}
+
+#workspacePathUpButton:hover:enabled {
+    background: #F8FAFC;
+}
+
+#workspacePathUpButton:disabled {
+    color: #A8B3C0;
+    background: #F8FAFC;
+}
+
+#workspacePathLabel {
     background: transparent;
     color: #64748B;
     font-size: 12px;
     font-weight: 600;
+}
+
+#workspaceExplorerPlaceholder {
+    background: transparent;
+    color: #6B7280;
+    font-size: 12px;
+    padding: 18px 12px;
 }
 
 #sidebarSectionTitle,
@@ -435,9 +458,10 @@ QMainWindow {
 
 #artifactList,
 #operationTree,
-#workspaceTree {
+#workspaceTree,
+#workspaceExplorerTable {
     border: none;
-    background: transparent;
+    background: #FFFFFF;
     outline: none;
 }
 
@@ -465,4 +489,67 @@ QMainWindow {
 #workspaceTree::item:selected {
     background: #E6F3F4;
     color: #0F6F78;
+}
+
+#workspaceExplorerTable {
+    border: 1px solid #E5ECF2;
+    border-radius: 12px;
+    gridline-color: transparent;
+    alternate-background-color: #FFFFFF;
+    selection-background-color: #E8F3F4;
+    selection-color: #0F6F78;
+}
+
+#workspaceExplorerTable::item {
+    padding: 8px 10px;
+    border: none;
+}
+
+#workspaceExplorerTable::item:hover {
+    background: #F8FAFC;
+}
+
+#workspaceExplorerTable::item:selected {
+    background: #E6F3F4;
+    color: #0F6F78;
+}
+
+#workspaceExplorerTable QHeaderView::section {
+    background: #FFFFFF;
+    color: #475569;
+    border: none;
+    border-bottom: 1px solid #E5ECF2;
+    padding: 8px 10px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+#workspaceExplorerTable QTableCornerButton::section {
+    background: #FFFFFF;
+    border: none;
+    border-bottom: 1px solid #E5ECF2;
+}
+
+#workspaceExplorerTable QScrollBar:vertical {
+    width: 10px;
+    background: transparent;
+    margin: 4px 2px 4px 2px;
+}
+
+#workspaceExplorerTable QScrollBar::handle:vertical {
+    background: #CBD5E1;
+    min-height: 28px;
+    border-radius: 5px;
+}
+
+#workspaceExplorerTable QScrollBar::handle:vertical:hover {
+    background: #94A3B8;
+}
+
+#workspaceExplorerTable QScrollBar::add-line:vertical,
+#workspaceExplorerTable QScrollBar::sub-line:vertical,
+#workspaceExplorerTable QScrollBar::add-page:vertical,
+#workspaceExplorerTable QScrollBar::sub-page:vertical {
+    background: transparent;
+    height: 0;
 }

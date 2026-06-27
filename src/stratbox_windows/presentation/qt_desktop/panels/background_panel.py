@@ -11,6 +11,7 @@ class BackgroundPanel(QWidget):
 
     def __init__(self, store: BackgroundProcessStore, parent=None) -> None:
         super().__init__(parent)
+        self.setObjectName('leftPanelSection')
         self._store = store
         self._boxes: dict[str, QCheckBox] = {}
         self._layout = QVBoxLayout(self)

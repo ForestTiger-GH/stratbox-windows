@@ -11,6 +11,7 @@ class AtomicScenariosPanel(QWidget):
 
     def __init__(self, registry: ScenarioRegistry, parent=None) -> None:
         super().__init__(parent)
+        self.setObjectName('leftPanelSection')
         self._registry = registry
         layout = QVBoxLayout(self)
         layout.setContentsMargins(18, 18, 14, 18)

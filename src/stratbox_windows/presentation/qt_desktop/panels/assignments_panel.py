@@ -12,6 +12,7 @@ class AssignmentsPanel(QWidget):
 
     def __init__(self, store: AssignmentStore, parent=None) -> None:
         super().__init__(parent)
+        self.setObjectName('leftPanelSection')
         self._store = store
         layout = QVBoxLayout(self)
         layout.setContentsMargins(18, 18, 14, 18)

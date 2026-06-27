@@ -11,6 +11,7 @@ class ParticipantsPanel(QWidget):
 
     def __init__(self, presence: PresenceService, parent=None) -> None:
         super().__init__(parent)
+        self.setObjectName('leftPanelSection')
         self._presence = presence
         layout = QVBoxLayout(self)
         layout.setContentsMargins(18, 18, 14, 18)

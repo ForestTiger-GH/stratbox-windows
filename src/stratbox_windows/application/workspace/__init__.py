@@ -13,6 +13,13 @@ from stratbox_windows.application.workspace.models import (
     WorkspaceRootStatus,
     WorkspaceResolution,
 )
+from stratbox_windows.application.workspace.explorer_models import (
+    ExplorerEntry,
+    ExplorerListing,
+    ExplorerLocation,
+    ExplorerSort,
+)
+from stratbox_windows.application.workspace.explorer_service import WorkspaceExplorerService
 from stratbox_windows.application.workspace.registry import WorkspaceRegistry, load_workspace_registry
 from stratbox_windows.application.workspace.diagnostics import resolve_data_root_status, run_workspace_diagnostics
 from stratbox_windows.application.workspace.resolver import resolve_workspace_root
@@ -47,4 +54,9 @@ __all__ = [
     "resolve_data_root_status",
     "resolve_workspace_root",
     "run_workspace_diagnostics",
+    "ExplorerEntry",
+    "ExplorerListing",
+    "ExplorerLocation",
+    "ExplorerSort",
+    "WorkspaceExplorerService",
 ]

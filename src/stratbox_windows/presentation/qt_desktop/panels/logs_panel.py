@@ -61,4 +61,4 @@ class LogsPanel(QWidget):
     def _open_current(self) -> None:
         item = self.list.currentItem()
         if item is not None:
-            self._platform.open_path(str(item.data(Qt.UserRole)))
+            self._platform.reveal_path(str(item.data(Qt.UserRole)))

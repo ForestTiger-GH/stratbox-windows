@@ -33,6 +33,8 @@ include-package-data = true
   "resources/images/*",
   "resources/icons/*.svg",
   "resources/icons/modes/*.svg",
+  "resources/icons/workspace/*.svg",
+  "resources/icons/files/*.svg",
 ]
 
 [tool.setuptools.packages.find]

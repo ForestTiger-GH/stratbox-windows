@@ -23,7 +23,7 @@ class ArtifactsPanel(QWidget):
         self.list.setObjectName('artifactList')
         self.list.itemDoubleClicked.connect(lambda *_: self._open_current())
         layout.addWidget(self.list, 1)
-        self.open_button = QPushButton('Открыть / показать в папке')
+        self.open_button = QPushButton('Открыть')
         self.open_button.setObjectName('secondaryActionButton')
         self.open_button.clicked.connect(self._open_current)
         layout.addWidget(self.open_button)
