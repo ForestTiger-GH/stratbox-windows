@@ -3,9 +3,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
-
-from stratbox.base.filestore import FileStore
+from typing import TYPE_CHECKING, Any
 
 from stratbox_windows.runtime.paths import AppPaths
 from stratbox_windows.runtime.version import VersionInfo
@@ -18,6 +16,9 @@ from stratbox_windows.runtime.session_runtime import (
 )
 from stratbox_windows.application.workspace import DataRootStatus, WorkspaceRootStatus, WorkspaceSchema
 
+if TYPE_CHECKING:
+    from stratbox.base.filestore import FileStore
+
 
 @dataclass(slots=True)
 class OperationContext:
@@ -26,7 +27,7 @@ class OperationContext:
     data_root_status: DataRootStatus
     workspace_root_path: Path | None
     workspace_status: WorkspaceRootStatus
-    filestore: FileStore | None
+    filestore: 'FileStore | None'
     paths: AppPaths
     version: VersionInfo
     logger: logging.Logger

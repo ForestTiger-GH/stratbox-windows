@@ -35,10 +35,11 @@ def _payload() -> dict:
         "workspace": {
             "install_root": "C:/StrategyBox",
             "system_root": "C:/StrategyBox/stratbox-windows-system",
-            "source_root": "C:/StrategyBox/appdock-bundles/repositories/primary",
+            "primary_root": "C:/StrategyBox/appdock-bundles/repositories/primary",
             "bundle_root": "C:/StrategyBox/appdock-bundles",
             "data_root_status": "available",
             "data_root_path": "D:/BusinessData",
+            "primary_form": "runtime_snapshot",
         },
         "provided_system_dirs": {
             "install_root_system_dir": {
@@ -81,7 +82,8 @@ def test_load_activation_context_reads_supported_contract(tmp_path: Path) -> Non
 
     assert context.world_id == "stratbox-windows"
     assert context.active_surface_id == "stratbox_windows.desktop"
-    assert context.workspace.source_root.endswith("primary")
+    assert context.workspace.primary_root.endswith("primary")
+    assert context.workspace.primary_form == "runtime_snapshot"
     assert context.available_route_groups == ("workspace", "logs")
 
 
@@ -93,4 +95,15 @@ def test_load_activation_context_rejects_unsupported_major(tmp_path: Path) -> No
     path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
 
     with pytest.raises(AppConfigError, match="Unsupported AppDock activation context contract version"):
+        load_activation_context(path)
+
+
+def test_load_activation_context_requires_primary_root(tmp_path: Path) -> None:
+    payload = _payload()
+    payload["workspace"].pop("primary_root")
+
+    path = tmp_path / "activation.json"
+    path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+
+    with pytest.raises(AppConfigError, match="activation_context.workspace misses primary_root"):
         load_activation_context(path)

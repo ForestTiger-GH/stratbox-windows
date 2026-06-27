@@ -6,8 +6,7 @@ import logging
 import os
 from dataclasses import dataclass
 from pathlib import Path
-
-from stratbox.base.filestore import FileStore
+from typing import TYPE_CHECKING
 
 from stratbox_windows.runtime.errors import AppStartupError
 from stratbox_windows.runtime.logging import setup_app_logger
@@ -39,6 +38,9 @@ from stratbox_windows.application.workspace import (
     resolve_workspace_root,
 )
 
+if TYPE_CHECKING:
+    from stratbox.base.filestore import FileStore
+
 
 @dataclass(slots=True)
 class AppContext:
@@ -58,7 +60,7 @@ class AppContext:
     workspace_root_path: Path | None
     workspace_status: WorkspaceRootStatus
     degraded_launch: bool
-    filestore: FileStore | None
+    filestore: 'FileStore | None'
     version: VersionInfo
     logger: logging.Logger
     node_id: str | None = None
@@ -112,11 +114,45 @@ def _resolve_run_contract(
     )
 
 
+def _core_dependency_error(exc: BaseException) -> AppStartupError:
+    return AppStartupError(
+        'Strategy Box core runtime dependency is missing. '
+        'Install the external package `stratbox` into the active AppDock runtime environment '
+        'or run AppDock repair before launching the desktop surface.'
+    )
+
+
+def _build_optional_filestore(
+    *,
+    workspace_root_path: Path | None,
+    workspace_available: bool,
+    allow_missing_runtime_dependencies: bool,
+    logger: logging.Logger,
+) -> 'FileStore | None':
+    if not workspace_available or workspace_root_path is None:
+        return None
+    try:
+        return build_filestore_for_workspace_root(workspace_root_path)
+    except ModuleNotFoundError as exc:
+        if exc.name == 'stratbox':
+            if allow_missing_runtime_dependencies:
+                logger.warning('Strategy Box core dependency is missing during preflight: %s', exc)
+                return None
+            raise _core_dependency_error(exc) from exc
+        raise
+    except Exception as exc:
+        if allow_missing_runtime_dependencies:
+            logger.warning('Filestore initialization is unavailable during preflight: %s: %s', type(exc).__name__, exc)
+            return None
+        raise AppStartupError(f'Failed to initialize workspace filestore: {exc}') from exc
+
+
 def build_app_context(
     *,
     standalone_dev_root: str | None = None,
     override_data_root_path: Path | None = None,
     launch_origin: str = 'standalone',
+    allow_missing_runtime_dependencies: bool = False,
 ) -> AppContext:
     run_mode, appdock_activation, data_root_selector_path = _resolve_run_contract(
         standalone_dev_root=standalone_dev_root,
@@ -160,8 +196,13 @@ def build_app_context(
     )
     workspace_root_path = workspace_resolution.workspace_root_path
     workspace_status = workspace_resolution.workspace_status
-    filestore = build_filestore_for_workspace_root(workspace_root_path) if workspace_status.available and workspace_root_path else None
-    version = get_version_info(paths.source_root)
+    filestore = _build_optional_filestore(
+        workspace_root_path=workspace_root_path,
+        workspace_available=workspace_status.available,
+        allow_missing_runtime_dependencies=allow_missing_runtime_dependencies,
+        logger=logger,
+    )
+    version = get_version_info(paths.product_root)
 
     degraded_launch = (
         (appdock_activation.degraded_launch if appdock_activation is not None else False)

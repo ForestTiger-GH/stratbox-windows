@@ -3,15 +3,19 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from stratbox.base.filestore import FileStore, LocalFileStore
+if TYPE_CHECKING:
+    from stratbox.base.filestore import FileStore
 
 
-def build_filestore_for_workspace_root(workspace_root_path: Path) -> FileStore:
+def build_filestore_for_workspace_root(workspace_root_path: Path) -> 'FileStore':
     """Создает FileStore для реального рабочего каталога приложения."""
+    from stratbox.base.filestore import LocalFileStore
+
     return LocalFileStore(root=str(workspace_root_path))
 
 
-def build_filestore_for_data_root(data_root_path: Path) -> FileStore:
+def build_filestore_for_data_root(data_root_path: Path) -> 'FileStore':
     """Совместимая обертка над новым именем функции."""
     return build_filestore_for_workspace_root(data_root_path)

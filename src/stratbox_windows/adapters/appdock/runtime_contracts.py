@@ -80,20 +80,22 @@ class SourceRevisionRef:
 class ActivationWorkspace:
     install_root: str
     system_root: str
-    source_root: str
+    primary_root: str
     bundle_root: str
     data_root_status: str
     data_root_path: str | None
+    primary_form: str | None = None
 
     @classmethod
     def from_dict(cls, payload: dict[str, Any]) -> 'ActivationWorkspace':
         return cls(
             install_root=_required_string(payload, 'install_root', scope='activation_context.workspace'),
             system_root=_required_string(payload, 'system_root', scope='activation_context.workspace'),
-            source_root=_required_string(payload, 'source_root', scope='activation_context.workspace'),
+            primary_root=_required_string(payload, 'primary_root', scope='activation_context.workspace'),
             bundle_root=_required_string(payload, 'bundle_root', scope='activation_context.workspace'),
             data_root_status=_required_string(payload, 'data_root_status', scope='activation_context.workspace'),
             data_root_path=(str(payload['data_root_path']) if payload.get('data_root_path') else None),
+            primary_form=(str(payload['primary_form']) if payload.get('primary_form') else None),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -414,8 +416,8 @@ def load_activation_context(path: Path) -> AppActivationContext:
         raise AppConfigError('AppDock activation context misses world.world_id')
     if not context.active_surface_id:
         raise AppConfigError('AppDock activation context misses active_surface.surface_id')
-    if not context.workspace.source_root:
-        raise AppConfigError('AppDock activation context misses workspace.source_root')
+    if not context.workspace.primary_root:
+        raise AppConfigError('AppDock activation context misses workspace.primary_root')
     if not context.workspace.install_root:
         raise AppConfigError('AppDock activation context misses workspace.install_root')
     if not context.workspace.system_root:

@@ -53,6 +53,22 @@ Surface запускается через:
 
 Это thin boundary entrypoint, который должен оставаться максимально тонким и не превращаться во второй runtime engine.
 
+## Runtime handoff contract
+
+На AppDock boundary каноническое поле рабочего корня теперь называется:
+
+- `workspace.primary_root`
+
+Именно это поле Strategy Box Windows должен читать из activation context. Внутри собственного runtime слоя это поле маппится в локальное понятие:
+
+- `product_root`
+
+То есть:
+
+- AppDock vocabulary остаётся снаружи;
+- внутренняя модель surface не копирует boundary-термины буквально;
+- старое ожидание `workspace.source_root` считается устаревшим и в продуктовый режим больше не входит.
+
 ## Что здесь важно не сломать
 
 - `manifest.json` и `preset.json` должны оставаться согласованными;

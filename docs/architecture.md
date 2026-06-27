@@ -75,6 +75,31 @@ Boundary к desktop host:
 - coordinators;
 - workers.
 
+## Boundary vocabulary vs internal runtime vocabulary
+
+У `stratbox-windows` должны существовать два разных словаря.
+
+### AppDock boundary vocabulary
+Это внешний контракт, который приходит от AppDock:
+
+- `workspace.primary_root`
+- `workspace.bundle_root`
+- `workspace.install_root`
+- `workspace.system_root`
+
+Этот словарь живёт в `adapters/appdock` и не должен расползаться как канонический по всему runtime.
+
+### Internal runtime vocabulary
+Это внутренний словарь Strategy Box Windows:
+
+- `product_root`
+- `src_dir`
+- `workspace_root_path`
+- `app_storage_root`
+- `managed_system_root`
+
+Такое разделение удерживает чистую границу: AppDock задаёт внешний handoff-контракт, а Strategy Box внутри живёт собственными runtime-понятиями.
+
 ## Что считать нормой для дальнейшей разработки
 
 - Новые AppDock-boundary изменения должны идти в `adapters/appdock`, а не в `runtime`.
@@ -82,3 +107,4 @@ Boundary к desktop host:
 - Если кусок можно описать как presentation semantics без Qt, он должен жить в `presentation/common`.
 - Если код требует виджетов/Qt signals/Qt event loop, он живёт в `presentation/qt_desktop`.
 - Любая бизнес-/core-логика должна уходить в `stratbox`, а не возвращаться в `stratbox-windows`.
+- Стартовый маршрут должен оставаться thin, но при этом обязан переводить startup/config/runtime boundary failures в управляемую пользовательскую ошибку, а не в сырой traceback.
