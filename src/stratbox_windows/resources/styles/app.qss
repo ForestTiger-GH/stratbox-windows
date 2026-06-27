@@ -156,7 +156,8 @@ QMainWindow {
 
 #bottomScenarioComposer,
 #bottomScenarioComposerGroup,
-#bottomScenarioComposerReserve {
+#bottomScenarioComposerReserve,
+#bottomScenarioComposerActions {
     background: transparent;
     border: none;
 }
@@ -174,7 +175,7 @@ QMainWindow {
     max-height: 46px;
     border: none;
     border-radius: 23px;
-    background: #0F6F78;
+    background: #3D777B;
     color: #FFFFFF;
     padding: 0;
     font-size: 24px;
@@ -183,11 +184,11 @@ QMainWindow {
 }
 
 #primaryRunButton:hover {
-    background: #0B5D64;
+    background: #356B6F;
 }
 
 #primaryRunButton:disabled {
-    background: #D8E5E7;
+    background: #D7E2E3;
     color: #FFFFFF;
 }
 
@@ -198,21 +199,21 @@ QMainWindow {
     max-height: 46px;
     border: none;
     border-radius: 23px;
-    background: #E99A36;
+    background: #C7A27A;
     color: #FFFFFF;
     padding: 0;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
     text-align: center;
 }
 
 #detailsToggleButton:hover {
-    background: #D88B29;
+    background: #B5926C;
 }
 
 #detailsToggleButton:disabled {
-    background: #EAD7BE;
-    color: #FFF6EB;
+    background: #E7DDD0;
+    color: #FFF7EF;
 }
 
 #composerOperationTitle {

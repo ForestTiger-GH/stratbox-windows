@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtWidgets import QFrame, QGridLayout, QHBoxLayout, QLabel, QPushButton, QVBoxLayout
+from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget
 
 from stratbox_windows.application.scenarios.models import ScenarioSpec
 
@@ -22,50 +22,52 @@ class BottomScenarioComposer(QFrame):
         outer.setSpacing(0)
         outer.addStretch(1)
 
-        self.launch_card = QFrame(self)
+        self.composer_group = QWidget(self)
+        self.composer_group.setObjectName('bottomScenarioComposerGroup')
+        composer_group_layout = QHBoxLayout(self.composer_group)
+        composer_group_layout.setContentsMargins(0, 0, 0, 0)
+        composer_group_layout.setSpacing(12)
+
+        self.launch_card = QFrame(self.composer_group)
         self.launch_card.setObjectName('scenarioLaunchCard')
         self.launch_card.setMaximumWidth(760)
         self.launch_card.setMinimumWidth(560)
-        card_layout = QGridLayout(self.launch_card)
-        card_layout.setContentsMargins(22, 18, 18, 16)
-        card_layout.setHorizontalSpacing(16)
-        card_layout.setVerticalSpacing(8)
-        card_layout.setColumnStretch(0, 1)
-        card_layout.setColumnStretch(1, 0)
-
-        text_col = QVBoxLayout()
-        text_col.setContentsMargins(0, 0, 0, 0)
-        text_col.setSpacing(6)
+        card_layout = QVBoxLayout(self.launch_card)
+        card_layout.setContentsMargins(22, 18, 22, 16)
+        card_layout.setSpacing(7)
 
         self.title = QLabel('Сценарий не выбран')
         self.title.setObjectName('composerOperationTitle')
         self.title.setWordWrap(True)
-        text_col.addWidget(self.title)
+        card_layout.addWidget(self.title)
 
         self.summary = QLabel('Выберите сценарий слева или откройте проводник.')
         self.summary.setObjectName('composerScenarioSummary')
         self.summary.setWordWrap(True)
-        text_col.addWidget(self.summary)
+        card_layout.addWidget(self.summary)
 
         self.meta = QLabel('После выбора сценария здесь появится краткая сводка запуска.')
         self.meta.setObjectName('composerScenarioMeta')
         self.meta.setWordWrap(True)
-        text_col.addWidget(self.meta)
+        card_layout.addWidget(self.meta)
+        card_layout.addStretch(1)
 
-        card_layout.addLayout(text_col, 0, 0, 2, 1)
+        composer_group_layout.addWidget(self.launch_card, 0, Qt.AlignBottom)
 
-        self.actions_host = QHBoxLayout()
-        self.actions_host.setContentsMargins(0, 0, 0, 0)
-        self.actions_host.setSpacing(10)
-        self.actions_host.addStretch(1)
+        self.actions_column = QWidget(self.composer_group)
+        self.actions_column.setObjectName('bottomScenarioComposerActions')
+        actions_layout = QVBoxLayout(self.actions_column)
+        actions_layout.setContentsMargins(0, 0, 0, 0)
+        actions_layout.setSpacing(10)
+        actions_layout.addStretch(1)
 
-        self.details_button = QPushButton('☰')
+        self.details_button = QPushButton('⋮')
         self.details_button.setObjectName('detailsToggleButton')
         self.details_button.setToolTip('Показать или скрыть детали')
         self.details_button.setCursor(Qt.PointingHandCursor)
         self.details_button.setFixedSize(46, 46)
         self.details_button.clicked.connect(self.details_requested.emit)
-        self.actions_host.addWidget(self.details_button)
+        actions_layout.addWidget(self.details_button, 0, Qt.AlignRight)
 
         self.run_button = QPushButton('→')
         self.run_button.setObjectName('primaryRunButton')
@@ -73,11 +75,11 @@ class BottomScenarioComposer(QFrame):
         self.run_button.setCursor(Qt.PointingHandCursor)
         self.run_button.setFixedSize(46, 46)
         self.run_button.clicked.connect(self.run_requested.emit)
-        self.actions_host.addWidget(self.run_button)
+        actions_layout.addWidget(self.run_button, 0, Qt.AlignRight)
 
-        card_layout.addLayout(self.actions_host, 1, 1, 1, 1, Qt.AlignRight | Qt.AlignBottom)
+        composer_group_layout.addWidget(self.actions_column, 0, Qt.AlignBottom)
 
-        outer.addWidget(self.launch_card, 0, Qt.AlignHCenter)
+        outer.addWidget(self.composer_group, 0, Qt.AlignHCenter | Qt.AlignBottom)
         outer.addStretch(1)
 
     @staticmethod

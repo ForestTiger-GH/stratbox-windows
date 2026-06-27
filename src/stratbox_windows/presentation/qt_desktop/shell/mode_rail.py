@@ -44,7 +44,7 @@ class ModeRail(QFrame):
             button.setCheckable(True)
             button.setToolTip(tooltip)
             button.setFixedSize(96, 96)
-            button.setIconSize(QSize(64, 64))
+            button.setIconSize(QSize(52, 52))
             icon_path = icons_root / icon_name
             active_icon_path = icons_root / active_icon_name
             normal_icon = QIcon(str(icon_path)) if icon_path.exists() else None
