@@ -132,7 +132,7 @@ QMainWindow {
 #secondaryActionButton,
 #feedActionButton {
     border: 1px solid #E5ECF2;
-    border-radius: 14px;
+    border-radius: 11px;
     background: #FFFFFF;
     padding: 8px 12px;
     color: #111827;
@@ -165,7 +165,7 @@ QMainWindow {
 
 #scenarioLaunchCard {
     border: 1px solid #E5ECF2;
-    border-radius: 22px;
+    border-radius: 16px;
     background: rgba(255, 255, 255, 0.96);
 }
 
@@ -288,7 +288,7 @@ QMainWindow {
 
 #scenarioCaseBubble {
     border: 1px solid #DFE8EF;
-    border-radius: 24px;
+    border-radius: 18px;
     background: rgba(255, 255, 255, 0.96);
 }
 
@@ -325,7 +325,7 @@ QMainWindow {
 
 #scenarioNoticeBubble {
     border: 1px solid #E8EEF4;
-    border-radius: 18px;
+    border-radius: 14px;
     background: rgba(255, 255, 255, 0.9);
 }
 
@@ -335,22 +335,23 @@ QMainWindow {
 }
 
 #newMessagesButton {
-    min-width: 44px;
-    max-width: 44px;
-    min-height: 44px;
-    max-height: 44px;
-    border: 1px solid #D9E4EC;
-    border-radius: 22px;
-    background: rgba(255, 255, 255, 0.96);
-    color: #35535A;
-    font-size: 21px;
-    font-weight: 700;
+    min-width: 48px;
+    max-width: 48px;
+    min-height: 48px;
+    max-height: 48px;
+    border: 1px solid #90C7CB;
+    border-radius: 24px;
+    background: #E6F3F4;
+    color: #0F6F78;
+    font-size: 22px;
+    font-weight: 800;
     padding: 0;
 }
 
 #newMessagesButton:hover {
-    background: #F8FBFC;
-    color: #0F6F78;
+    background: #D8ECEE;
+    border-color: #6EB1B7;
+    color: #0B5B61;
 }
 
 #chatMessageTitle {

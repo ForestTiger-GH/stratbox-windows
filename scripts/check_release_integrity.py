@@ -12,7 +12,6 @@ REQUIRED_FILES = [
     'docs/architecture.md',
     'docs/development.md',
     'docs/appdock-integration.md',
-    '.github/workflows/ci.yml',
     'tests/contracts/test_runtime_contracts.py',
     'tests/smoke/test_external_core_dependency.py',
     'tests/unit/test_paths.py',

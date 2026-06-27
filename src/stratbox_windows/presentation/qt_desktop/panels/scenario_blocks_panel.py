@@ -34,6 +34,7 @@ class ScenarioBlocksPanel(QWidget):
             if scenario.kind != 'composite':
                 continue
             item = QListWidgetItem(f'{scenario.title}\n{len(scenario.steps)} шаг(ов)')
+            item.setData(Qt.UserRole, scenario.id)
             item.setToolTip(scenario.description)
             self.list.addItem(item)
 

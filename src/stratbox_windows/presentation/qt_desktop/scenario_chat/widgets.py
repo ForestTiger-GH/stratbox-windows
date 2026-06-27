@@ -318,14 +318,14 @@ class ScenarioMessageRow(QWidget):
             widget = item.widget()
             if widget is not None:
                 widget.setParent(self)
-        self._layout.setAlignment(Qt.AlignTop)
+        self._layout.setAlignment(Qt.AlignBottom)
         if self._message.placement == 'outgoing':
             self._layout.addStretch(1)
-            self._layout.addWidget(self._bubble, 0, Qt.AlignTop | Qt.AlignRight)
-            self._layout.addWidget(self._avatar, 0, Qt.AlignTop | Qt.AlignRight)
+            self._layout.addWidget(self._bubble, 0, Qt.AlignBottom | Qt.AlignRight)
+            self._layout.addWidget(self._avatar, 0, Qt.AlignBottom | Qt.AlignRight)
         else:
-            self._layout.addWidget(self._avatar, 0, Qt.AlignTop | Qt.AlignLeft)
-            self._layout.addWidget(self._bubble, 0, Qt.AlignTop | Qt.AlignLeft)
+            self._layout.addWidget(self._avatar, 0, Qt.AlignBottom | Qt.AlignLeft)
+            self._layout.addWidget(self._bubble, 0, Qt.AlignBottom | Qt.AlignLeft)
             self._layout.addStretch(1)
 
     def _apply_bubble_width(self) -> None:
@@ -542,8 +542,8 @@ class ScenarioChatView(QScrollArea):
         if button is None:
             return
         size = button.sizeHint()
-        button.resize(max(44, size.width()), max(44, size.height()))
-        x = self.viewport().width() - button.width() - 18
+        button.resize(max(48, size.width()), max(48, size.height()))
+        x = 18
         y = self.viewport().height() - button.height() - 18
-        button.move(max(8, x), max(8, y))
+        button.move(max(12, x), max(8, y))
         button.raise_()

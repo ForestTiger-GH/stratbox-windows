@@ -31,7 +31,7 @@ class ChatBackgroundWidget(QWidget):
     def paintEvent(self, event) -> None:  # type: ignore[override]
         painter = QPainter(self)
         painter.setRenderHint(QPainter.SmoothPixmapTransform, True)
-        painter.fillRect(self.rect(), QColor('#F4F7FA'))
+        painter.fillRect(self.rect(), QColor('#F8FAFC'))
         if not self._scaled.isNull():
             x = (self.width() - self._scaled.width()) // 2
             y = (self.height() - self._scaled.height()) // 2
