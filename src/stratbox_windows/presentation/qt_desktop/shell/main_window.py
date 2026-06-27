@@ -52,7 +52,6 @@ class MainWindow(QMainWindow):
         self.body.left_panel.assignment_selected.connect(self._assignment_changed)
         self.body.left_panel.assignment_case_selected.connect(self._select_case)
         self.body.center_panel.run_requested.connect(self._run_selected_scenario)
-        self.body.center_panel.parameters_requested.connect(lambda: self.body.open_right_drawer('parameters'))
         self.body.center_panel.details_requested.connect(self.body.toggle_right_drawer)
         self.body.center_panel.artifact_open_requested.connect(self.runtime.platform.open_path)
         self.body.center_panel.case_selected.connect(self._select_case)

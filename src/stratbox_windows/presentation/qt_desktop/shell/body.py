@@ -8,7 +8,6 @@ from .center_panel import CenterScenarioPanel
 from .left_panel import LeftPanel
 from .mode_rail import ModeRail
 from .right_drawer import RightInspectorDrawer
-from .top_bar import TopBar
 
 
 class ShellBodyWidget(QWidget):
@@ -57,9 +56,8 @@ class ShellBodyWidget(QWidget):
         central_layout = QVBoxLayout(self.central_host)
         central_layout.setContentsMargins(0, 0, 0, 0)
         central_layout.setSpacing(0)
-        self.top_bar = TopBar(runtime, self.central_host)
         self.center_panel = CenterScenarioPanel(runtime, self.central_host)
-        central_layout.addWidget(self.top_bar)
+        self.top_bar = self.center_panel.top_bar
         central_layout.addWidget(self.center_panel, 1)
         root.addWidget(self.central_host, 1)
 

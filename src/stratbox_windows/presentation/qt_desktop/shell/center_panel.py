@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Qt, Signal
 
 from stratbox_windows.application.events.models import OperationalEvent
 from stratbox_windows.presentation.qt_desktop.chat_scene import ChatSceneHost
 from stratbox_windows.presentation.qt_desktop.components.background_strip import ActiveBackgroundStrip
+from .top_bar import TopBar
 from stratbox_windows.presentation.qt_desktop.components.scenario_composer import BottomScenarioComposer
 from stratbox_windows.presentation.common.scenario_chat.models import ScenarioChatMessage
 from stratbox_windows.presentation.common.scenario_chat.projector import project_case, project_event
@@ -19,7 +20,6 @@ def _chat_background_image_path():
 
 class CenterScenarioPanel(ChatSceneHost):
     run_requested = Signal()
-    parameters_requested = Signal()
     details_requested = Signal()
     artifact_open_requested = Signal(str)
     case_selected = Signal(str)
@@ -30,6 +30,9 @@ class CenterScenarioPanel(ChatSceneHost):
         self.setObjectName('centerPanel')
         self._runtime = runtime
         self._filter_mode = runtime.context.user_config.chat.filter_mode
+        self.top_bar = TopBar(runtime, self.overlay_top)
+        self.overlay_top_layout.addWidget(self.top_bar, 1, Qt.AlignTop)
+
         self.background_strip = ActiveBackgroundStrip(runtime.background_store)
         self.background_strip.process_selected.connect(self.background_process_selected.emit)
         self.content_layout.addWidget(self.background_strip)
@@ -39,7 +42,6 @@ class CenterScenarioPanel(ChatSceneHost):
         self.content_layout.addWidget(self.chat, 1)
         self.composer = BottomScenarioComposer()
         self.composer.run_requested.connect(self.run_requested.emit)
-        self.composer.parameters_requested.connect(self.parameters_requested.emit)
         self.composer.details_requested.connect(self.details_requested.emit)
         self.content_layout.addWidget(self.composer)
         self.refresh()

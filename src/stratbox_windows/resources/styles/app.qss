@@ -25,18 +25,22 @@ QMainWindow {
 }
 
 #leftShellHeader {
+    background: #FFFFFF;
     border-bottom: 1px solid #E5ECF2;
 }
 
 #leftShellBrandTitle {
-    font-size: 22px;
-    font-weight: 700;
+    background: transparent;
+    font-size: 18px;
+    font-weight: 400;
     color: #111827;
 }
 
-#topBar {
-    background: #FFFFFF;
-    border-bottom: 1px solid #E5ECF2;
+#topBar,
+#centerSceneOverlay,
+#centerSceneTopOverlay {
+    background: transparent;
+    border: none;
 }
 
 #topBarFiltersHost {
@@ -74,8 +78,8 @@ QMainWindow {
 }
 
 #modeRailButton {
-    border: 1px solid transparent;
-    border-radius: 14px;
+    border: none;
+    border-radius: 0;
     background: transparent;
     padding: 0;
     color: #64748B;
@@ -85,14 +89,12 @@ QMainWindow {
 }
 
 #modeRailButton:hover {
-    background: #F8FAFC;
-    border-color: #E5ECF2;
+    background: #F3F7FB;
 }
 
 #modeRailButton[active="true"],
 #modeRailButton:checked {
-    background: #E6F3F4;
-    border-color: #B7DCDD;
+    background: #DDEEF2;
     color: #0F6F78;
 }
 
@@ -150,10 +152,17 @@ QMainWindow {
     font-weight: 700;
 }
 
-#bottomScenarioComposer {
+#bottomScenarioComposer,
+#bottomScenarioComposerGroup,
+#bottomScenarioComposerReserve {
+    background: transparent;
+    border: none;
+}
+
+#scenarioLaunchCard {
     border: 1px solid #E5ECF2;
     border-radius: 22px;
-    background: #FFFFFF;
+    background: rgba(255, 255, 255, 0.96);
 }
 
 #primaryRunButton {
@@ -173,6 +182,33 @@ QMainWindow {
     background: #E5ECF2;
     border-color: #E5ECF2;
     color: #94A3B8;
+}
+
+#detailsToggleButton {
+    border: 1px solid #D99134;
+    border-radius: 14px;
+    background: #E99A36;
+    color: #FFFFFF;
+    padding: 0;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+#detailsToggleButton:hover {
+    background: #D88B29;
+    border-color: #C77E1E;
+}
+
+#detailsToggleButton:disabled {
+    background: #E7D5BD;
+    border-color: #E7D5BD;
+    color: #FFF6EB;
+}
+
+#composerOperationTitle {
+    font-size: 15px;
+    font-weight: 700;
+    color: #111827;
 }
 
 #rightInspectorDrawer {

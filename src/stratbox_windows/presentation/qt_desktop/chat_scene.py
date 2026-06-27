@@ -4,7 +4,7 @@ from pathlib import Path
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor, QPainter, QPixmap
-from PySide6.QtWidgets import QVBoxLayout, QWidget
+from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
 
 
 class ChatBackgroundWidget(QWidget):
@@ -72,8 +72,22 @@ class ChatSceneHost(QWidget):
         self.content = QWidget(self)
         self.content.setObjectName('centerSceneContent')
         self.content_layout = QVBoxLayout(self.content)
-        self.content_layout.setContentsMargins(8, 12, 8, 12)
+        self.content_layout.setContentsMargins(12, 72, 12, 16)
         self.content_layout.setSpacing(12)
+
+        self.overlay = QWidget(self)
+        self.overlay.setObjectName('centerSceneOverlay')
+        self.overlay_layout = QVBoxLayout(self.overlay)
+        self.overlay_layout.setContentsMargins(12, 12, 12, 0)
+        self.overlay_layout.setSpacing(0)
+
+        self.overlay_top = QWidget(self.overlay)
+        self.overlay_top.setObjectName('centerSceneTopOverlay')
+        self.overlay_top_layout = QHBoxLayout(self.overlay_top)
+        self.overlay_top_layout.setContentsMargins(0, 0, 0, 0)
+        self.overlay_top_layout.setSpacing(0)
+        self.overlay_layout.addWidget(self.overlay_top)
+        self.overlay_layout.addStretch(1)
 
         self._sync_layers()
 
@@ -87,3 +101,5 @@ class ChatSceneHost(QWidget):
         self.content.setGeometry(rect)
         self.background.lower()
         self.content.raise_()
+        self.overlay.setGeometry(rect)
+        self.overlay.raise_()

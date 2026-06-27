@@ -30,8 +30,8 @@ class TopBar(QWidget):
         self._filter_buttons: dict[str, QPushButton] = {}
         self._filter_mode = runtime.context.user_config.chat.filter_mode
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(20, 12, 20, 12)
-        layout.setSpacing(10)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(12)
         self.filters_host = QWidget(self)
         self.filters_host.setObjectName('topBarFiltersHost')
         filters_layout = QHBoxLayout(self.filters_host)
