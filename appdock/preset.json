@@ -8,9 +8,15 @@
     "vendor": "Strategy Box",
     "channel": "default"
   },
-  "source_policy": {
-    "source_mode": "user_selected_managed_source",
-    "allow_user_source_selection": true
+  "primary_source": {
+    "source_form": "runtime_snapshot",
+    "entry_mode": "preset_locked",
+    "fixed_locator": "https://github.com/ForestTiger-GH/stratbox-windows.git",
+    "ref_kind": "branch",
+    "ref": "main",
+    "refresh_policy": "on_launch",
+    "refresh_failure_policy": "use_local",
+    "modified_checkout_policy": "recreate"
   },
   "bundle_composition": {
     "auxiliary_sources": [
@@ -42,7 +48,7 @@
     "allow_frontdoor_skip_when_installed": true
   },
   "visibility_policy": {
-    "show_source_step": true,
+    "show_source_step": false,
     "show_preview_step": true,
     "show_install_step": true,
     "show_review_step": true
@@ -55,10 +61,6 @@
     "branding_mode": "default",
     "display_name_override": "Strategy Box"
   },
-  "update_policy": {
-    "mode": "manual",
-    "update_on_launch": false
-  },
   "shortcut_policy": {
     "desktop_shortcut": false,
     "start_menu_shortcut": false,
@@ -67,6 +69,8 @@
   "feature_selection": {
     "enabled_features": [
       "desktop_surface",
+      "runtime_snapshot",
+      "source_refresh_on_launch",
       "resume",
       "artifacts",
       "presence"
@@ -92,6 +96,9 @@
   },
   "metadata": {
     "product_kind": "desktop_analytics_app",
-    "default_off_policy": true
+    "default_off_policy": true,
+    "primary_source_mode": "preset_locked_runtime_snapshot",
+    "primary_source_locator": "github_main_branch",
+    "refresh_on_launch": true
   }
 }

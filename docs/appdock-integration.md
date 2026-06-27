@@ -2,7 +2,7 @@
 
 ## Роль репозитория
 
-`stratbox-windows` — это primary AppDock surface repository для Strategy Box на Windows.
+`stratbox-windows` — primary AppDock surface repository для Strategy Box на Windows.
 
 Он содержит:
 - `appdock/manifest.json`
@@ -14,18 +14,36 @@
 
 ## Как AppDock должен мыслить этот продукт
 
+Для актуального AppDock Strategy Box Windows должен жить как product-mode desktop world:
+
 - primary repo: `stratbox-windows`
+- primary source form: `runtime_snapshot`
+- primary source entry mode: `preset_locked`
+- primary source locator: GitHub clone URL `stratbox-windows`
+- primary source ref: branch `main`
+- primary source refresh policy: `on_launch`
 - bundled runtime dependency: `stratbox`
 
-В `appdock/preset.json` это оформлено через `bundle_composition.auxiliary_sources`. Core должен materialize-иться AppDock и ставиться в managed environment как runtime dependency.
+Это означает, что Runtime Shell не должен запрашивать repo source у пользователя. Источник зафиксирован preset-ом, а AppDock сам:
 
-## Что должно быть уже готово в AppDock
+1. refresh-ит primary source cache;
+2. materialize-ит актуальный runtime snapshot;
+3. materialize-ит auxiliary bundled source `stratbox-core`;
+4. ставит bundled dependency в AppDock-managed runtime environment;
+5. запускает primary surface.
 
-AppDock должен уметь:
-- materialize bundled repos;
-- включать их в install graph;
-- ставить bundled repos в managed `.venv`;
-- запускать primary surface через activation target без костылей через `PYTHONPATH=primary/src`.
+## Bundle composition
+
+В `appdock/preset.json` core-репозиторий оформлен через `bundle_composition.auxiliary_sources`.
+
+Core должен оставаться:
+
+- auxiliary bundled source;
+- bundled snapshot input;
+- runtime dependency для AppDock-managed runtime environment;
+- `runtime_install_editable = false`.
+
+То есть `stratbox` остаётся частью product shape, но не подменяет primary world surface repository.
 
 ## Activation target
 
@@ -40,4 +58,5 @@ Surface запускается через:
 - `manifest.json` и `preset.json` должны оставаться согласованными;
 - repo не должен снова начать тащить локальную копию `stratbox`;
 - bundled dependency на `stratbox` должна оставаться частью product shape;
-- AppDock-specific код должен оставаться в `adapters/appdock`, а не расползаться по всему runtime.
+- AppDock-specific код должен оставаться в `adapters/appdock`, а не расползаться по всему runtime;
+- конечный product mode не должен откатываться обратно к `attached_source` или к user-selected repo source.

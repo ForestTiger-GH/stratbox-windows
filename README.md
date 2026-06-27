@@ -38,8 +38,17 @@ python -m stratbox_windows --standalone-dev-root ./.tmp/dev-workspace --diagnose
 
 `appdock/manifest.json` объявляет primary desktop surface `stratbox_windows.desktop`.
 
-`appdock/preset.json` дополнительно включает bundled runtime dependency `stratbox-core`, которая должна materialize-иться и ставиться в managed environment AppDock.
+`appdock/preset.json` описывает Strategy Box как конечный product-mode выпуск для AppDock:
 
+- primary source = `stratbox-windows`;
+- source form = `runtime_snapshot`;
+- entry mode = `preset_locked`;
+- fixed locator = GitHub clone URL этого репозитория;
+- ref = `main`;
+- refresh policy = `on_launch`;
+- auxiliary bundled source = `stratbox-core`.
+
+Это означает, что Runtime Shell не должен запрашивать у пользователя внешний репозиторий вручную. AppDock сам держит primary source cache, обновляет его при запуске, materialize-ит актуальный runtime snapshot и отдельно ставит bundled dependency `stratbox` в AppDock-managed runtime environment.
 
 ## Документация
 
