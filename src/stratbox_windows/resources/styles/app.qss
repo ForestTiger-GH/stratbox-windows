@@ -17,7 +17,16 @@ QMainWindow {
 #leftShellHeader,
 #leftShellBody,
 #leftPanel,
-#leftPanelSection {
+#leftPanelSection,
+#leftPanel QStackedWidget,
+#leftPanel QStackedWidget > QWidget,
+#leftPanel QAbstractScrollArea,
+#leftPanel QAbstractItemView,
+#leftPanel QTableView,
+#leftPanel QHeaderView,
+#leftPanel QHeaderView::section,
+#leftPanel QScrollArea,
+#leftPanel QWidget[panelRole="content"] {
     background: #FFFFFF;
 }
 
@@ -129,41 +138,6 @@ QMainWindow {
 
 #workspaceMountHeader[available="false"] #workspaceMountLine {
     color: #64748B;
-}
-
-#workspacePathBar {
-    background: transparent;
-    border: none;
-}
-
-#workspacePathUpButton {
-    min-width: 26px;
-    max-width: 26px;
-    min-height: 26px;
-    max-height: 26px;
-    border: 1px solid #E5ECF2;
-    border-radius: 9px;
-    background: #FFFFFF;
-    color: #334155;
-    font-size: 13px;
-    font-weight: 700;
-    padding: 0;
-}
-
-#workspacePathUpButton:hover:enabled {
-    background: #F8FAFC;
-}
-
-#workspacePathUpButton:disabled {
-    color: #A8B3C0;
-    background: #F8FAFC;
-}
-
-#workspacePathLabel {
-    background: transparent;
-    color: #64748B;
-    font-size: 12px;
-    font-weight: 600;
 }
 
 #workspaceExplorerPlaceholder {
@@ -493,7 +467,7 @@ QMainWindow {
 
 #workspaceExplorerTable {
     border: 1px solid #E5ECF2;
-    border-radius: 12px;
+    border-radius: 0;
     gridline-color: transparent;
     alternate-background-color: #FFFFFF;
     selection-background-color: #E8F3F4;
@@ -503,6 +477,7 @@ QMainWindow {
 #workspaceExplorerTable::item {
     padding: 8px 10px;
     border: none;
+    background: #FFFFFF;
 }
 
 #workspaceExplorerTable::item:hover {

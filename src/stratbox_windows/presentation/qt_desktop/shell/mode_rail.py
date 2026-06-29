@@ -35,7 +35,7 @@ class ModeRail(QFrame):
         self._buttons: dict[str, QToolButton] = {}
         self._icons: dict[str, tuple[QIcon | None, QIcon | None]] = {}
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(0, 6, 0, 10)
+        layout.setContentsMargins(0, 0, 0, 10)
         layout.setSpacing(2)
         icons_root = Path(__file__).resolve().parents[3] / 'resources' / 'icons' / 'modes'
         for mode, icon_name, active_icon_name, caption, tooltip in self._ITEMS:

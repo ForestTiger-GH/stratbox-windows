@@ -13,11 +13,10 @@ class WorkspaceMountHeader(QWidget):
         self.setObjectName('workspaceMountHeader')
         self.setProperty('available', True)
         self._full_line_text = 'AppDock (недоступно)'
-        self._status_text = ''
 
         layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(8)
+        layout.setSpacing(6)
 
         self._icon_label = QLabel(self)
         self._icon_label.setObjectName('workspaceMountIcon')
@@ -30,17 +29,16 @@ class WorkspaceMountHeader(QWidget):
         layout.addWidget(self._line_label, 1, Qt.AlignVCenter)
 
         icons_root = Path(__file__).resolve().parents[3] / 'resources' / 'icons' / 'workspace'
-        icon_path = icons_root / 'network_drive.svg'
+        icon_path = icons_root / 'appdock_drive.svg'
         if icon_path.exists():
             icon = QIcon(str(icon_path))
             self._icon_label.setPixmap(icon.pixmap(16, 16))
         else:
-            self._icon_label.setText('⛁')
+            self._icon_label.setText('🗂')
 
-        self.set_mount(path_text='(недоступно)', available=False, status_text='Источник AppDock пока недоступен.')
+        self.set_mount(path_text='(недоступно)', available=False)
 
     def set_mount(self, *, path_text: str, available: bool, status_text: str = '') -> None:
-        self._status_text = status_text
         self.setProperty('available', bool(available))
         self._full_line_text = f'AppDock {path_text or "(недоступно)"}'
         self._update_line_label()
@@ -58,6 +56,6 @@ class WorkspaceMountHeader(QWidget):
 
     def _update_line_label(self) -> None:
         metrics = QFontMetrics(self._line_label.font())
-        width = max(140, self._line_label.width() or self.width() - 28)
+        width = max(160, self._line_label.width() or self.width() - 22)
         shown = metrics.elidedText(self._full_line_text, Qt.ElideMiddle, width)
         self._line_label.setText(shown)

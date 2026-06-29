@@ -16,7 +16,6 @@ from PySide6.QtWidgets import (
 
 from stratbox_windows.application.workspace import ExplorerEntry, ExplorerSort, WorkspaceExplorerService
 from stratbox_windows.presentation.qt_desktop.components.workspace_mount_header import WorkspaceMountHeader
-from stratbox_windows.presentation.qt_desktop.components.workspace_path_bar import WorkspacePathBar
 from stratbox_windows.presentation.qt_desktop.workspace.explorer_table_model import ExplorerTableModel
 from stratbox_windows.runtime.context import AppContext
 
@@ -41,10 +40,6 @@ class WorkspacePanel(QWidget):
 
         self._mount_header = WorkspaceMountHeader(self)
         layout.addWidget(self._mount_header)
-
-        self._path_bar = WorkspacePathBar(self)
-        self._path_bar.up_requested.connect(self._navigate_up)
-        layout.addWidget(self._path_bar)
 
         self._empty_label = QLabel(self)
         self._empty_label.setObjectName('workspaceExplorerPlaceholder')
@@ -123,7 +118,6 @@ class WorkspacePanel(QWidget):
             self._table_model.set_listing(None)
             self.table.clearSelection()
             self.table.setVisible(False)
-            self._path_bar.set_path(parts=('Рабочая область',), can_go_up=False, tooltip_text='')
             self._empty_label.setText(self._context.workspace_status.message or 'Рабочая область Strategy Box пока недоступна.')
             self._empty_label.show()
             return
@@ -131,17 +125,13 @@ class WorkspacePanel(QWidget):
         self._table_model.set_listing(listing)
         self.table.setVisible(True)
         self._empty_label.hide()
-        self._path_bar.set_path(
-            parts=listing.location.display_parts,
-            can_go_up=listing.location.can_go_up,
-            tooltip_text=str(listing.location.current_path),
-        )
         self.table.horizontalHeader().setSortIndicator(
             ExplorerTableModel.NAME_COLUMN if self._sort.column == 'name' else ExplorerTableModel.TYPE_COLUMN,
             Qt.AscendingOrder if self._sort.direction == 'asc' else Qt.DescendingOrder,
         )
         if listing.entries:
-            self.table.selectRow(0)
+            preferred_row = 1 if listing.entries[0].is_navigation_up and len(listing.entries) > 1 else 0
+            self.table.selectRow(preferred_row)
         else:
             self.table.clearSelection()
 
@@ -153,12 +143,15 @@ class WorkspacePanel(QWidget):
 
     def _selection_changed(self) -> None:
         entry = self._current_entry()
-        if entry is not None:
+        if entry is not None and not entry.is_navigation_up:
             self.path_selected.emit(str(entry.path))
 
     def _activate_current(self) -> None:
         entry = self._current_entry()
         if entry is None:
+            return
+        if entry.is_navigation_up:
+            self._navigate_up()
             return
         if entry.is_navigable:
             self._enter_entry(entry)
@@ -200,24 +193,24 @@ class WorkspacePanel(QWidget):
         refresh_action = menu.addAction('Обновить')
         open_action = None
         copy_action = None
-        up_action = None
         if entry is not None:
-            open_action = menu.addAction('Открыть' if not entry.is_navigable else 'Открыть папку')
-            copy_action = menu.addAction('Скопировать путь')
-        if self._location is not None and self._location.can_go_up:
-            up_action = menu.addAction('Вверх')
+            if entry.is_navigation_up:
+                open_action = menu.addAction('Вверх')
+            else:
+                open_action = menu.addAction('Открыть' if not entry.is_navigable else 'Открыть папку')
+                copy_action = menu.addAction('Скопировать путь')
         chosen = menu.exec(self.table.viewport().mapToGlobal(pos))
         if chosen == refresh_action:
             self.refresh()
         elif chosen == open_action and entry is not None:
-            if entry.is_navigable:
+            if entry.is_navigation_up:
+                self._navigate_up()
+            elif entry.is_navigable:
                 self._enter_entry(entry)
             else:
                 self.open_path_requested.emit(str(entry.path))
-        elif chosen == copy_action and entry is not None:
+        elif chosen == copy_action and entry is not None and not entry.is_navigation_up:
             self.copy_path_requested.emit(str(entry.path))
-        elif chosen == up_action:
-            self._navigate_up()
 
     @staticmethod
     def _load_icons() -> dict[str, QIcon]:

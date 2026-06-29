@@ -95,6 +95,9 @@ class WorkspaceExplorerService:
         raw_children = self._provider.list_children(location.current_path)
         entries = [self._build_entry(location, child) for child in raw_children]
         entries.sort(key=lambda entry: self._sort_key(entry, sort), reverse=(sort.direction == 'desc'))
+        if location.can_go_up:
+            parent = location.current_path.parent
+            entries.insert(0, self._build_navigation_up_entry(location, parent))
         return ExplorerListing(location=location, entries=tuple(entries), sort=sort)
 
     def _build_entry(self, location: ExplorerLocation, child: Path) -> ExplorerEntry:
@@ -119,6 +122,20 @@ class WorkspaceExplorerService:
             icon_key=icon_key,
             is_navigable=is_directory,
             is_openable=True,
+        )
+
+    def _build_navigation_up_entry(self, location: ExplorerLocation, target: Path) -> ExplorerEntry:
+        return ExplorerEntry(
+            entry_id='..',
+            name='↖ Вверх',
+            kind='navigate_up',
+            path=target,
+            relative_path=Path('..'),
+            extension='',
+            type_label='Папка',
+            icon_key='folder',
+            is_navigable=False,
+            is_openable=False,
         )
 
     @staticmethod

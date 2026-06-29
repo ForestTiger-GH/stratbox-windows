@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
-ExplorerEntryKind = Literal['directory', 'file']
+ExplorerEntryKind = Literal['directory', 'file', 'navigate_up']
 ExplorerSortColumn = Literal['name', 'type']
 ExplorerSortDirection = Literal['asc', 'desc']
 
@@ -54,6 +54,10 @@ class ExplorerEntry:
     icon_key: str
     is_navigable: bool
     is_openable: bool
+
+    @property
+    def is_navigation_up(self) -> bool:
+        return self.kind == 'navigate_up'
 
 
 @dataclass(frozen=True, slots=True)

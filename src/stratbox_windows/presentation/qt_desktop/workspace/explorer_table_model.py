@@ -54,6 +54,8 @@ class ExplorerTableModel(QAbstractTableModel):
             return str(entry.path)
         if role == Qt.UserRole + 1:
             return entry.kind
+        if role == Qt.UserRole + 2:
+            return entry.is_navigation_up
         return None
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: int = Qt.DisplayRole):  # noqa: N802

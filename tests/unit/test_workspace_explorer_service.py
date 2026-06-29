@@ -52,6 +52,10 @@ def test_workspace_explorer_service_navigates_inside_workspace_only(tmp_path: Pa
     assert child.display_parts == ('Strategy Box Data', 'input')
     assert child.can_go_up is True
 
+    child_listing = service.list_location(child, ExplorerSort())
+    assert child_listing.entries[0].name == '↖ Вверх'
+    assert child_listing.entries[0].kind == 'navigate_up'
+
     parent = service.parent_location(child)
     assert parent is not None
     assert parent.current_path == workspace_root
