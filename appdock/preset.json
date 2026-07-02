@@ -35,7 +35,7 @@
     ]
   },
   "install_context": {
-    "mode": "portable_local",
+    "mode": "machine_managed_install",
     "install_display_name": "Strategy Box",
     "allow_install_root_override": true,
     "bundle_root_policy": "inside_install_root",
