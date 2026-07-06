@@ -60,8 +60,7 @@
         "settings"
       ],
       "compatible_modes": [
-        "local",
-        "attached"
+        "local"
       ],
       "required_capabilities": [
         "runtime.activate"
@@ -103,8 +102,7 @@
     ],
     "publication_profiles": [],
     "supported_node_modes": [
-      "local",
-      "attached"
+      "local"
     ]
   },
   "capabilities": {
@@ -123,8 +121,7 @@
       "health_snapshot"
     ],
     "compatible_modes": [
-      "local",
-      "attached"
+      "local"
     ]
   },
   "storage": {

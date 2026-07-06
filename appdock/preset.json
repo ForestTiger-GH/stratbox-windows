@@ -6,7 +6,7 @@
     "display_name": "Strategy Box",
     "product_version": "0.1.0",
     "vendor": "Strategy Box",
-    "channel": "default"
+    "channel": "stable"
   },
   "primary_source": {
     "source_form": "runtime_snapshot",
@@ -18,44 +18,51 @@
     "refresh_failure_policy": "use_local",
     "modified_checkout_policy": "recreate"
   },
-  "bundle_composition": {
-    "auxiliary_sources": [
+  "package_composition": {
+    "package_sources": [
       {
-        "mount_id": "stratbox-core",
+        "mount_id": "stratbox",
         "source_ref": "https://github.com/ForestTiger-GH/stratbox.git",
         "source_kind": "remote_repository",
         "display_name": "Strategy Box Core",
-        "include_mode": "bundled_snapshot",
-        "probe_policy": "no_frontdoor_probe",
-        "runtime_install_mode": "pip",
-        "runtime_install_target": ".",
-        "runtime_install_editable": false,
-        "runtime_install_extras": []
+        "include_mode": "packaged_snapshot",
+        "probe_policy": "skip_source_probe",
+        "installation_recipe": {
+          "mode": "pip",
+          "target": ".",
+          "editable": false,
+          "extras": []
+        }
       }
     ]
   },
   "install_context": {
     "mode": "machine_managed_install",
     "install_display_name": "Strategy Box",
-    "allow_install_root_override": true,
-    "bundle_root_policy": "inside_install_root",
-    "data_root_policy": "inside_install_root",
+    "allow_install_root_override": false,
+    "package_root_policy": "platform_managed",
+    "data_root_policy": "platform_managed",
     "show_advanced_options": false
   },
-  "frontdoor": {
-    "presentation_profile_id": "terminal_minimal",
-    "requires_frontdoor_before_launch": true,
-    "allow_frontdoor_skip_when_installed": true
+  "shell": {
+    "boot_surface": {
+      "profile_id": "mark_default"
+    },
+    "setup_surface": {
+      "profile_id": "shell_setup_terminal",
+      "requires_before_runtime": true,
+      "allow_skip_when_ready": true
+    },
+    "post_setup_entry": {
+      "profile_id": "direct_entry_surface",
+      "visibility": "visible"
+    }
   },
   "visibility_policy": {
     "show_source_step": false,
-    "show_preview_step": true,
+    "show_preview_step": false,
     "show_install_step": true,
     "show_review_step": true
-  },
-  "entry_behavior": {
-    "profile_id": "direct_to_app",
-    "launcher_visibility": "on_demand"
   },
   "branding": {
     "branding_mode": "default",
@@ -63,26 +70,26 @@
   },
   "shortcut_policy": {
     "desktop_shortcut": false,
-    "start_menu_shortcut": false,
-    "shortcut_target": "entry_surface"
+    "start_menu_shortcut": true,
+    "shortcut_target": "shell"
   },
   "feature_selection": {
     "enabled_features": [
       "desktop_surface",
       "runtime_snapshot",
       "source_refresh_on_launch",
-      "resume",
-      "artifacts",
-      "presence"
+      "package_refresh_on_launch",
+      "artifacts"
     ],
     "disabled_features": [
       "remote_attach",
-      "delegated_jobs"
+      "delegated_jobs",
+      "published_host"
     ],
     "visible_sectors": [
       "runtime",
-      "artifacts",
-      "workspace"
+      "workspace",
+      "artifacts"
     ],
     "hidden_sectors": [
       "remote",
@@ -90,9 +97,21 @@
     ]
   },
   "first_run": {
-    "requires_frontdoor": true,
-    "entry_behavior_profile_id": "direct_to_app",
-    "allow_skip_after_completion": true
+    "mode": "guided_setup",
+    "requires_review_before_launch": true,
+    "remember_user_choice": false,
+    "auto_continue_when_ready": false,
+    "open_shell_after_first_setup": false,
+    "allow_skip_when_prepared": true
+  },
+  "update_policy": {
+    "source_refresh": "on_launch",
+    "package_refresh": "on_launch",
+    "release_update": "manual",
+    "channel": "embedded_release",
+    "rollback_policy": "disallow",
+    "failure_policy": "use_local",
+    "staged_rollout": false
   },
   "metadata": {
     "product_kind": "desktop_analytics_app",

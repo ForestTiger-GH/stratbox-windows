@@ -4,7 +4,7 @@
 
 ## Что считается правильной границей
 
-- `stratbox` — внешний core package и bundled runtime dependency.
+- `stratbox` — внешний core package и дополнительный package source с бизнес-логикой.
 - `stratbox-windows` — primary AppDock surface repo.
 - `AppDock` — внешний runtime/productization/deployment контур.
 

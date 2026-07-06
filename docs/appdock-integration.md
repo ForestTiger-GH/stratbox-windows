@@ -14,34 +14,37 @@
 
 ## Как AppDock должен мыслить этот продукт
 
-Для актуального AppDock Strategy Box Windows должен жить как product-mode desktop world:
+Для актуального AppDock Strategy Box Windows должен жить как конечный desktop product:
 
-- primary repo: `stratbox-windows`
+- primary source: `stratbox-windows`
 - primary source form: `runtime_snapshot`
 - primary source entry mode: `preset_locked`
 - primary source locator: GitHub clone URL `stratbox-windows`
 - primary source ref: branch `main`
 - primary source refresh policy: `on_launch`
-- bundled runtime dependency: `stratbox`
+- additional package source: `stratbox`
+- package refresh policy: `on_launch`
+- install mode: `machine_managed_install`
+- post-setup entry: `direct_entry_surface`
 
 Это означает, что Runtime Shell не должен запрашивать repo source у пользователя. Источник зафиксирован preset-ом, а AppDock сам:
 
 1. refresh-ит primary source cache;
-2. materialize-ит актуальный runtime snapshot;
-3. materialize-ит auxiliary bundled source `stratbox-core`;
-4. ставит bundled dependency в AppDock-managed runtime environment;
-5. запускает primary surface.
+2. materialize-ит актуальный runtime snapshot для `stratbox-windows`;
+3. refresh-ит и materialize-ит дополнительный package source `stratbox`;
+4. применяет installation recipe для package source;
+5. запускает primary desktop surface Strategy Box.
 
-## Bundle composition
+## Package composition
 
-В `appdock/preset.json` core-репозиторий оформлен через `bundle_composition.auxiliary_sources`.
+В `appdock/preset.json` core-репозиторий оформлен через `package_composition.package_sources`.
 
 Core должен оставаться:
 
-- auxiliary bundled source;
-- bundled snapshot input;
+- дополнительным package source;
+- packaged snapshot input;
 - runtime dependency для AppDock-managed runtime environment;
-- `runtime_install_editable = false`.
+- `installation_recipe.editable = false`.
 
 То есть `stratbox` остаётся частью product shape, но не подменяет primary world surface repository.
 
@@ -55,7 +58,7 @@ Surface запускается через:
 
 ## Runtime handoff contract
 
-На AppDock boundary каноническое поле рабочего корня теперь называется:
+На AppDock boundary каноническое поле рабочего корня сейчас называется:
 
 - `workspace.primary_root`
 
@@ -67,12 +70,20 @@ Surface запускается через:
 
 - AppDock vocabulary остаётся снаружи;
 - внутренняя модель surface не копирует boundary-термины буквально;
-- старое ожидание `workspace.source_root` считается устаревшим и в продуктовый режим больше не входит.
+- старое ожидание `workspace.source_root` в product mode больше не используется.
+
+Дополнительно activation context всё ещё может нести:
+- `workspace.bundle_root`
+- `workspace.install_root`
+- `workspace.system_root`
+
+Но для самого приложения главным входом остаётся `workspace.primary_root`.
 
 ## Что здесь важно не сломать
 
 - `manifest.json` и `preset.json` должны оставаться согласованными;
 - repo не должен снова начать тащить локальную копию `stratbox`;
-- bundled dependency на `stratbox` должна оставаться частью product shape;
+- `stratbox` должен оставаться отдельным package source, а не встроенной копией исходников;
 - AppDock-specific код должен оставаться в `adapters/appdock`, а не расползаться по всему runtime;
-- конечный product mode не должен откатываться обратно к `attached_source` или к user-selected repo source.
+- конечный product mode не должен откатываться обратно к legacy attached/user-selected repo source routes;
+- системная установка должна оставаться machine-managed и platform-managed по roots/данным.
