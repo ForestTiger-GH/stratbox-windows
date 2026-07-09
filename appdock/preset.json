@@ -8,25 +8,30 @@
     "vendor": "Strategy Box",
     "channel": "stable"
   },
-  "primary_source": {
-    "source_form": "runtime_snapshot",
-    "entry_mode": "preset_locked",
-    "fixed_locator": "https://github.com/ForestTiger-GH/stratbox-windows.git",
-    "ref_kind": "branch",
-    "ref": "main",
-    "refresh_policy": "on_launch",
-    "refresh_failure_policy": "use_local",
-    "modified_checkout_policy": "recreate"
-  },
-  "package_composition": {
-    "package_sources": [
+  "platform_profile": "platform_windows",
+  "output_format_profile": "output_format_exe",
+  "install_profile": "install_local_system",
+  "source_profile": "source_preset",
+  "source_composition": {
+    "sources": [
+      {
+        "source_ref": "https://github.com/ForestTiger-GH/stratbox-windows.git",
+        "source_location_profile": "source_location_remote",
+        "source_packaging_profile": "source_packaging_installable",
+        "source_manifest_state": "source_manifest_included",
+        "display_name": "Strategy Box Windows",
+        "ref_kind": "branch",
+        "ref": "main"
+      },
       {
         "mount_id": "stratbox",
         "source_ref": "https://github.com/ForestTiger-GH/stratbox.git",
-        "source_kind": "remote_repository",
+        "source_location_profile": "source_location_remote",
+        "source_packaging_profile": "source_packaging_installable",
+        "source_manifest_state": "source_manifest_none",
         "display_name": "Strategy Box Core",
-        "include_mode": "packaged_snapshot",
-        "probe_policy": "skip_source_probe",
+        "ref_kind": "branch",
+        "ref": "main",
         "installation_recipe": {
           "mode": "pip",
           "target": ".",
@@ -37,35 +42,10 @@
     ]
   },
   "install_context": {
-    "mode": "machine_managed_install",
     "install_display_name": "Strategy Box",
-    "allow_install_root_override": false,
-    "package_root_policy": "platform_managed",
-    "data_root_policy": "platform_managed",
-    "show_advanced_options": false
-  },
-  "shell": {
-    "boot_surface": {
-      "profile_id": "mark_default"
-    },
-    "setup_surface": {
-      "profile_id": "shell_setup_terminal",
-      "requires_before_runtime": true,
-      "allow_skip_when_ready": true
-    },
-    "post_setup_entry": {
-      "profile_id": "direct_entry_surface",
-      "visibility": "visible"
-    }
-  },
-  "visibility_policy": {
-    "show_source_step": false,
-    "show_preview_step": false,
-    "show_install_step": true,
-    "show_review_step": true
+    "allow_install_root_override": false
   },
   "branding": {
-    "branding_mode": "default",
     "display_name_override": "Strategy Box"
   },
   "shortcut_policy": {
@@ -74,50 +54,25 @@
     "shortcut_target": "shell"
   },
   "feature_selection": {
-    "enabled_features": [
-      "desktop_surface",
-      "runtime_snapshot",
-      "source_refresh_on_launch",
-      "package_refresh_on_launch",
-      "artifacts"
-    ],
-    "disabled_features": [
-      "remote_attach",
-      "delegated_jobs",
-      "published_host"
-    ],
-    "visible_sectors": [
-      "runtime",
-      "workspace",
-      "artifacts"
-    ],
-    "hidden_sectors": [
-      "remote",
-      "host"
-    ]
+    "feature_update_enabled": true,
+    "feature_node_enabled": false,
+    "feature_data_enabled": true,
+    "feature_brand_enabled": false
   },
-  "first_run": {
-    "mode": "guided_setup",
-    "requires_review_before_launch": true,
-    "remember_user_choice": false,
-    "auto_continue_when_ready": false,
-    "open_shell_after_first_setup": false,
-    "allow_skip_when_prepared": true
-  },
-  "update_policy": {
-    "source_refresh": "on_launch",
-    "package_refresh": "on_launch",
-    "release_update": "manual",
-    "channel": "embedded_release",
-    "rollback_policy": "disallow",
-    "failure_policy": "use_local",
-    "staged_rollout": false
+  "update_profile": "update_start_force",
+  "node_profile": "node_disabled",
+  "data_profile": "data_enabled",
+  "data_location_profile": "data_location_local_preset",
+  "welcome_profile": "welcome_banner",
+  "entry_profile": "entry_direct",
+  "brand_profile": "brand_disabled",
+  "brand_selection": {
+    "selected_assets": []
   },
   "metadata": {
     "product_kind": "desktop_analytics_app",
     "default_off_policy": true,
-    "primary_source_mode": "preset_locked_runtime_snapshot",
-    "primary_source_locator": "github_main_branch",
-    "refresh_on_launch": true
+    "refresh_on_launch": true,
+    "deployment_posture": "system_install_preset_sources_force_refresh"
   }
 }

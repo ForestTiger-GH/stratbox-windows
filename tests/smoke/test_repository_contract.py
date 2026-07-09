@@ -7,6 +7,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def _manifest() -> dict:
+    return json.loads((ROOT / "appdock" / "manifest.json").read_text(encoding="utf-8"))
+
+
+def _preset() -> dict:
+    return json.loads((ROOT / "appdock" / "preset.json").read_text(encoding="utf-8"))
+
+
 def test_manifest_and_preset_exist() -> None:
     manifest = ROOT / "appdock" / "manifest.json"
     preset = ROOT / "appdock" / "preset.json"
@@ -16,15 +24,14 @@ def test_manifest_and_preset_exist() -> None:
 
 
 def test_manifest_uses_stratbox_windows_entrypoint() -> None:
-    manifest = json.loads((ROOT / "appdock" / "manifest.json").read_text(encoding="utf-8"))
-    activation = manifest["surfaces"][0]["activation"]
+    activation = _manifest()["surfaces"][0]["activation"]
 
     assert activation["kind"] == "python_module"
     assert activation["target"] == "stratbox_windows.adapters.appdock.entry"
 
 
 def test_manifest_is_local_only_surface() -> None:
-    manifest = json.loads((ROOT / "appdock" / "manifest.json").read_text(encoding="utf-8"))
+    manifest = _manifest()
     surface = manifest["surfaces"][0]
 
     assert surface["compatible_modes"] == ["local"]
@@ -34,63 +41,81 @@ def test_manifest_is_local_only_surface() -> None:
     assert manifest["capabilities"]["supports_delegated_jobs"] is False
 
 
-def test_preset_uses_locked_runtime_snapshot_from_github_main() -> None:
-    preset = json.loads((ROOT / "appdock" / "preset.json").read_text(encoding="utf-8"))
-    primary = preset["primary_source"]
+def test_manifest_requests_install_root_system_dir() -> None:
+    request = _manifest()["storage"]["requests"]["install_root_system_dir"]
 
-    assert primary["source_form"] == "runtime_snapshot"
-    assert primary["entry_mode"] == "preset_locked"
-    assert primary["fixed_locator"] == "https://github.com/ForestTiger-GH/stratbox-windows.git"
+    assert request["enabled"] is True
+    assert request["directory_name"] == "stratbox-windows-system"
+
+
+def test_preset_uses_system_install_and_force_update_profiles() -> None:
+    preset = _preset()
+
+    assert preset["platform_profile"] == "platform_windows"
+    assert preset["output_format_profile"] == "output_format_exe"
+    assert preset["install_profile"] == "install_local_system"
+    assert preset["source_profile"] == "source_preset"
+    assert preset["update_profile"] == "update_start_force"
+    assert preset["node_profile"] == "node_disabled"
+    assert preset["data_profile"] == "data_enabled"
+    assert preset["data_location_profile"] == "data_location_local_preset"
+    assert preset["welcome_profile"] == "welcome_banner"
+    assert preset["entry_profile"] == "entry_direct"
+    assert preset["brand_profile"] == "brand_disabled"
+
+
+def test_preset_declares_manifest_bearing_primary_source() -> None:
+    sources = _preset()["source_composition"]["sources"]
+    manifest_sources = [item for item in sources if item["source_manifest_state"] == "source_manifest_included"]
+
+    assert len(manifest_sources) == 1
+    primary = manifest_sources[0]
+    assert primary["source_ref"] == "https://github.com/ForestTiger-GH/stratbox-windows.git"
+    assert primary["source_location_profile"] == "source_location_remote"
+    assert primary["source_packaging_profile"] == "source_packaging_installable"
     assert primary["ref_kind"] == "branch"
     assert primary["ref"] == "main"
-    assert primary["refresh_policy"] == "on_launch"
-    assert primary["refresh_failure_policy"] == "use_local"
-    assert primary["modified_checkout_policy"] == "recreate"
 
 
-def test_preset_declares_additional_stratbox_package_source() -> None:
-    preset = json.loads((ROOT / "appdock" / "preset.json").read_text(encoding="utf-8"))
-    sources = preset["package_composition"]["package_sources"]
+def test_preset_declares_secondary_stratbox_source() -> None:
+    sources = _preset()["source_composition"]["sources"]
+    secondary_sources = [item for item in sources if item["source_manifest_state"] == "source_manifest_none"]
 
-    assert sources
-    assert sources[0]["mount_id"] == "stratbox"
-    assert sources[0]["include_mode"] == "packaged_snapshot"
-    assert sources[0]["probe_policy"] == "skip_source_probe"
-    assert sources[0]["installation_recipe"]["mode"] == "pip"
-    assert sources[0]["installation_recipe"]["editable"] is False
-
-
-def test_preset_uses_machine_managed_system_install() -> None:
-    preset = json.loads((ROOT / "appdock" / "preset.json").read_text(encoding="utf-8"))
-    install = preset["install_context"]
-
-    assert install["mode"] == "machine_managed_install"
-    assert install["allow_install_root_override"] is False
-    assert install["package_root_policy"] == "platform_managed"
-    assert install["data_root_policy"] == "platform_managed"
+    assert len(secondary_sources) == 1
+    secondary = secondary_sources[0]
+    assert secondary["mount_id"] == "stratbox"
+    assert secondary["source_ref"] == "https://github.com/ForestTiger-GH/stratbox.git"
+    assert secondary["source_location_profile"] == "source_location_remote"
+    assert secondary["source_packaging_profile"] == "source_packaging_installable"
+    assert secondary["installation_recipe"]["mode"] == "pip"
+    assert secondary["installation_recipe"]["target"] == "."
+    assert secondary["installation_recipe"]["editable"] is False
+    assert secondary["installation_recipe"]["extras"] == []
 
 
-def test_preset_opens_strategy_box_after_setup() -> None:
-    preset = json.loads((ROOT / "appdock" / "preset.json").read_text(encoding="utf-8"))
+def test_preset_feature_selection_matches_local_desktop_product() -> None:
+    features = _preset()["feature_selection"]
 
-    assert preset["shell"]["post_setup_entry"]["profile_id"] == "direct_entry_surface"
-    assert preset["first_run"]["open_shell_after_first_setup"] is False
-
-
-def test_preset_refreshes_primary_and_package_sources_on_launch() -> None:
-    preset = json.loads((ROOT / "appdock" / "preset.json").read_text(encoding="utf-8"))
-    update = preset["update_policy"]
-
-    assert update["source_refresh"] == "on_launch"
-    assert update["package_refresh"] == "on_launch"
-    assert update["release_update"] == "manual"
+    assert features["feature_update_enabled"] is True
+    assert features["feature_node_enabled"] is False
+    assert features["feature_data_enabled"] is True
+    assert features["feature_brand_enabled"] is False
 
 
-def test_preset_hides_locked_source_step() -> None:
-    preset = json.loads((ROOT / "appdock" / "preset.json").read_text(encoding="utf-8"))
-    visibility = preset["visibility_policy"]
+def test_preset_shortcuts_match_desktop_product_posture() -> None:
+    shortcuts = _preset()["shortcut_policy"]
 
-    assert visibility["show_source_step"] is False
-    assert visibility["show_preview_step"] is False
-    assert visibility["show_install_step"] is True
-    assert visibility["show_review_step"] is True
+    assert shortcuts["desktop_shortcut"] is False
+    assert shortcuts["start_menu_shortcut"] is True
+    assert shortcuts["shortcut_target"] == "shell"
+
+
+def test_preset_no_longer_uses_legacy_primary_and_package_blocks() -> None:
+    preset = _preset()
+
+    assert "primary_source" not in preset
+    assert "package_composition" not in preset
+    assert "update_policy" not in preset
+    assert "visibility_policy" not in preset
+    assert "first_run" not in preset
+    assert "shell" not in preset
