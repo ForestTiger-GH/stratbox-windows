@@ -10,7 +10,6 @@ from typing import Literal
 from stratbox_windows.adapters.appdock.runtime_contracts import ActivationSystemDir, AppActivationContext
 
 APP_DIR_NAME = 'Strategy Box'
-APPDOCK_MANAGED_SYSTEM_DIR_NAME = 'stratbox-windows-system'
 APP_STORAGE_DEV_DIR_NAME = '.stratbox_windows'
 StorageMode = Literal['appdock_managed', 'standalone_user_profile', 'standalone_dev_root']
 
@@ -41,7 +40,7 @@ class AppPaths:
     health_snapshot_path: Path | None = None
     runtime_state_path: Path | None = None
     cleanup_registry_path: Path | None = None
-    bundle_root: Path | None = None
+    package_root: Path | None = None
     dev_root: Path | None = None
 
 
@@ -61,10 +60,10 @@ def _ensure_directories(*paths: Path) -> None:
         path.mkdir(parents=True, exist_ok=True)
 
 
-def _resolve_managed_storage_root(*, install_root: Path, install_root_system_dir: ActivationSystemDir | None) -> Path:
+def _resolve_managed_storage_root(*, system_root: Path, install_root_system_dir: ActivationSystemDir | None) -> Path:
     if install_root_system_dir is not None and str(install_root_system_dir.path).strip():
         return Path(install_root_system_dir.path).expanduser()
-    return install_root / APPDOCK_MANAGED_SYSTEM_DIR_NAME
+    return system_root
 
 
 def _build_storage_roots(app_storage_root: Path) -> tuple[Path, Path, Path, Path]:
@@ -90,14 +89,14 @@ def _build_appdock_managed_paths(
     session_dir = session_state_path.parent if session_state_path is not None else None
 
     managed_system_root = _resolve_managed_storage_root(
-        install_root=install_root,
+        system_root=system_root,
         install_root_system_dir=appdock_activation.provided_system_dirs.install_root_system_dir,
     )
     logs_dir, operation_logs_dir, cache_dir, runtime_dir = _build_storage_roots(managed_system_root)
     app_config_path_resolved = managed_system_root / 'app.json'
 
     workspace = appdock_activation.workspace
-    bundle_root = Path(workspace.bundle_root).expanduser() if workspace.bundle_root else None
+    package_root = Path(workspace.package_root).expanduser()
 
     user_state_path = Path(appdock_activation.refs.user_state_ref).expanduser() if appdock_activation.refs.user_state_ref else None
     active_session_path = Path(appdock_activation.refs.active_session_ref).expanduser() if appdock_activation.refs.active_session_ref else None
@@ -130,7 +129,7 @@ def _build_appdock_managed_paths(
         health_snapshot_path=health_snapshot_path,
         runtime_state_path=runtime_state_path,
         cleanup_registry_path=cleanup_registry_path,
-        bundle_root=bundle_root,
+        package_root=package_root,
     )
 
 

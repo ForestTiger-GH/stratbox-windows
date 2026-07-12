@@ -12,13 +12,13 @@ from stratbox_windows.runtime.errors import AppConfigError
 def _payload() -> dict:
     return {
         "contract_version": "1.0",
-        "generated_at_utc": "2026-06-24T00:00:00Z",
+        "generated_at_utc": "2026-07-12T00:00:00Z",
         "world": {
-            "world_id": "stratbox-windows",
+            "world_id": "stratbox",
             "display_name": "Strategy Box",
         },
         "active_surface": {
-            "surface_id": "stratbox_windows.desktop",
+            "surface_id": "desktop",
             "entry_view": "scenario_chat",
             "declared_views": ["scenario_chat", "workspace"],
         },
@@ -34,19 +34,20 @@ def _payload() -> dict:
         },
         "workspace": {
             "install_root": "C:/StrategyBox",
-            "system_root": "C:/StrategyBox/stratbox-windows-system",
-            "primary_root": "C:/StrategyBox/appdock-bundles/repositories/primary",
-            "bundle_root": "C:/StrategyBox/appdock-bundles",
-            "data_root_status": "available",
+            "system_root": "C:/StrategyBox/appdock-system",
+            "package_root": "C:/StrategyBox/appdock-packages",
+            "data_root_status": "configured",
             "data_root_path": "D:/BusinessData",
-            "primary_form": "runtime_snapshot",
+            "primary_root": "C:/StrategyBox/appdock-packages/repositories/primary",
+            "primary_source_location_profile": "source_location_remote",
+            "primary_content_runtime_profile": "content_runtime_managed_editable",
         },
         "provided_system_dirs": {
             "install_root_system_dir": {
-                "kind": "install_root_system_dir",
-                "directory_name": "stratbox-windows-system",
-                "path": "C:/StrategyBox/stratbox-windows-system",
-                "provider_class": "install_root",
+                "kind": "install_root",
+                "directory_name": "system",
+                "path": "C:/StrategyBox/appdock-system",
+                "provider_class": "filesystem",
             }
         },
         "refs": {
@@ -59,7 +60,7 @@ def _payload() -> dict:
         },
         "node": {
             "node_id": "node-1",
-            "node_created_at_utc": "2026-06-24T00:00:00Z",
+            "node_created_at_utc": "2026-07-12T00:00:00Z",
             "host_name": "strategy-host",
         },
         "user": {
@@ -68,22 +69,34 @@ def _payload() -> dict:
         },
         "session": {
             "session_id": "session-1",
-            "session_started_at_utc": "2026-06-24T00:00:00Z",
+            "session_started_at_utc": "2026-07-12T00:00:00Z",
         },
         "available_route_groups": ["workspace", "logs"],
+        "package_mounts": [
+            {
+                "mount_id": "stratbox",
+                "relative_path": "repositories/stratbox",
+                "source_location_profile": "source_location_remote",
+                "display_name": "Strategy Box Core",
+                "source_ref": "https://github.com/ForestTiger-GH/stratbox.git",
+            }
+        ],
     }
 
 
-def test_load_activation_context_reads_supported_contract(tmp_path: Path) -> None:
+def test_load_activation_context_reads_current_contract(tmp_path: Path) -> None:
     path = tmp_path / "activation.json"
     path.write_text(json.dumps(_payload(), ensure_ascii=False), encoding="utf-8")
 
     context = load_activation_context(path)
 
-    assert context.world_id == "stratbox-windows"
-    assert context.active_surface_id == "stratbox_windows.desktop"
+    assert context.world_id == "stratbox"
+    assert context.active_surface_id == "desktop"
     assert context.workspace.primary_root.endswith("primary")
-    assert context.workspace.primary_form == "runtime_snapshot"
+    assert context.workspace.package_root.endswith("appdock-packages")
+    assert context.workspace.primary_source_location_profile == "source_location_remote"
+    assert context.workspace.primary_content_runtime_profile == "content_runtime_managed_editable"
+    assert context.package_mounts[0].mount_id == "stratbox"
     assert context.available_route_groups == ("workspace", "logs")
 
 
@@ -98,12 +111,12 @@ def test_load_activation_context_rejects_unsupported_major(tmp_path: Path) -> No
         load_activation_context(path)
 
 
-def test_load_activation_context_requires_primary_root(tmp_path: Path) -> None:
+def test_load_activation_context_requires_current_workspace_fields(tmp_path: Path) -> None:
     payload = _payload()
-    payload["workspace"].pop("primary_root")
+    payload["workspace"].pop("package_root")
 
     path = tmp_path / "activation.json"
     path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
 
-    with pytest.raises(AppConfigError, match="activation_context.workspace misses primary_root"):
+    with pytest.raises(AppConfigError, match="activation_context.workspace misses package_root"):
         load_activation_context(path)

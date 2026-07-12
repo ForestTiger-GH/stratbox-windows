@@ -8,7 +8,6 @@ REQUIRED_FILES = [
     'README.md',
     'pyproject.toml',
     'appdock/manifest.json',
-    'appdock/preset.json',
     'docs/architecture.md',
     'docs/development.md',
     'docs/appdock-integration.md',

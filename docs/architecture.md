@@ -83,7 +83,7 @@ Boundary к desktop host:
 Это внешний контракт, который приходит от AppDock:
 
 - `workspace.primary_root`
-- `workspace.bundle_root`
+- `workspace.package_root`
 - `workspace.install_root`
 - `workspace.system_root`
 
