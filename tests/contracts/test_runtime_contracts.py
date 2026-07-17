@@ -5,118 +5,75 @@ from pathlib import Path
 
 import pytest
 
-from stratbox_windows.adapters.appdock.runtime_contracts import load_activation_context
+from stratbox_windows.adapters.appdock.runtime_contracts import (
+    ACTIVATION_CONTEXT_CONTRACT_VERSION,
+    load_activation_context,
+)
 from stratbox_windows.runtime.errors import AppConfigError
 
 
-def _payload() -> dict:
-    return {
-        "contract_version": "1.0",
-        "generated_at_utc": "2026-07-12T00:00:00Z",
-        "world": {
-            "world_id": "stratbox",
-            "display_name": "Strategy Box",
-        },
-        "active_surface": {
-            "surface_id": "desktop",
-            "entry_view": "scenario_chat",
-            "declared_views": ["scenario_chat", "workspace"],
-        },
-        "activation": {
-            "attach_mode": "local",
-            "degraded_launch": False,
-        },
-        "source_revision": {
-            "ref_kind": "branch",
-            "ref": "main",
-            "commit": "abc123",
-            "sync_mode": "snapshot",
-        },
-        "workspace": {
-            "install_root": "C:/StrategyBox",
-            "system_root": "C:/StrategyBox/appdock-system",
-            "package_root": "C:/StrategyBox/appdock-packages",
-            "data_root_status": "configured",
-            "data_root_path": "D:/BusinessData",
-            "primary_root": "C:/StrategyBox/appdock-packages/repositories/primary",
-            "primary_source_location_profile": "source_location_remote",
-            "primary_content_runtime_profile": "content_runtime_managed_editable",
-        },
-        "provided_system_dirs": {
-            "install_root_system_dir": {
-                "kind": "install_root",
-                "directory_name": "system",
-                "path": "C:/StrategyBox/appdock-system",
-                "provider_class": "filesystem",
-            }
-        },
-        "refs": {
-            "health_snapshot_ref": "C:/StrategyBox/refs/health.json",
-            "user_state_ref": "C:/StrategyBox/refs/user.json",
-            "session_ref": "C:/StrategyBox/refs/session.json",
-            "active_session_ref": "C:/StrategyBox/refs/active_session.json",
-            "runtime_state_ref": "C:/StrategyBox/refs/runtime.json",
-            "cleanup_registry_ref": "C:/StrategyBox/refs/cleanup.json",
-        },
-        "node": {
-            "node_id": "node-1",
-            "node_created_at_utc": "2026-07-12T00:00:00Z",
-            "host_name": "strategy-host",
-        },
-        "user": {
-            "user_id": "user-1",
-            "account_name": "analyst",
-        },
-        "session": {
-            "session_id": "session-1",
-            "session_started_at_utc": "2026-07-12T00:00:00Z",
-        },
-        "available_route_groups": ["workspace", "logs"],
-        "package_mounts": [
-            {
-                "mount_id": "stratbox",
-                "relative_path": "repositories/stratbox",
-                "source_location_profile": "source_location_remote",
-                "display_name": "Strategy Box Core",
-                "source_ref": "https://github.com/ForestTiger-GH/stratbox.git",
-            }
-        ],
-    }
+def _write(path: Path, payload: dict) -> Path:
+    path.write_text(json.dumps(payload, ensure_ascii=False), encoding='utf-8')
+    return path
 
 
-def test_load_activation_context_reads_current_contract(tmp_path: Path) -> None:
-    path = tmp_path / "activation.json"
-    path.write_text(json.dumps(_payload(), ensure_ascii=False), encoding="utf-8")
+def test_load_activation_context_reads_strict_contract_3(
+    tmp_path: Path,
+    appdock_activation_payload: dict,
+) -> None:
+    context = load_activation_context(_write(tmp_path / 'activation.json', appdock_activation_payload))
 
-    context = load_activation_context(path)
-
-    assert context.world_id == "stratbox"
-    assert context.active_surface_id == "desktop"
-    assert context.workspace.primary_root.endswith("primary")
-    assert context.workspace.package_root.endswith("appdock-packages")
-    assert context.workspace.primary_source_location_profile == "source_location_remote"
-    assert context.workspace.primary_content_runtime_profile == "content_runtime_managed_editable"
-    assert context.package_mounts[0].mount_id == "stratbox"
-    assert context.available_route_groups == ("workspace", "logs")
-
-
-def test_load_activation_context_rejects_unsupported_major(tmp_path: Path) -> None:
-    payload = _payload()
-    payload["contract_version"] = "2.0"
-
-    path = tmp_path / "activation.json"
-    path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
-
-    with pytest.raises(AppConfigError, match="Unsupported AppDock activation context contract version"):
-        load_activation_context(path)
+    assert context.contract_version == ACTIVATION_CONTEXT_CONTRACT_VERSION
+    assert context.world_id == 'stratbox'
+    assert context.active_surface_id == 'desktop'
+    assert context.entry_view == 'scenario_chat'
+    assert context.workspace.source_root.endswith('stratbox-windows/payload')
+    assert context.workspace.user_workspace_root.endswith('workspace')
+    assert context.workspace.source_location_profile == 'source_location_remote'
+    assert context.workspace.content_runtime_profile == 'content_runtime_sealed_materialized'
+    assert context.provided_system_dirs.user_private_system_dir is not None
+    assert context.provided_system_dirs.user_private_system_dir.kind == 'user_local'
+    assert context.runtime_package_by_binding_id('stratbox-core-python').package_id == 'stratbox'
+    assert context.runtime_package_by_binding_id('stratbox-windows-python').package_id == 'stratbox-windows'
+    assert context.available_route_groups == ('workspace', 'logs')
 
 
-def test_load_activation_context_requires_current_workspace_fields(tmp_path: Path) -> None:
-    payload = _payload()
-    payload["workspace"].pop("package_root")
+def test_load_activation_context_rejects_legacy_contract(
+    tmp_path: Path,
+    appdock_activation_payload: dict,
+) -> None:
+    appdock_activation_payload['contract_version'] = '1.0'
 
-    path = tmp_path / "activation.json"
-    path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+    with pytest.raises(AppConfigError, match='requires 3.0'):
+        load_activation_context(_write(tmp_path / 'activation.json', appdock_activation_payload))
 
-    with pytest.raises(AppConfigError, match="activation_context.workspace misses package_root"):
-        load_activation_context(path)
+
+def test_load_activation_context_rejects_legacy_workspace_and_package_mounts(
+    tmp_path: Path,
+    appdock_activation_payload: dict,
+) -> None:
+    appdock_activation_payload['workspace']['primary_root'] = appdock_activation_payload['workspace'].pop('source_root')
+    appdock_activation_payload['package_mounts'] = []
+
+    with pytest.raises(AppConfigError, match='unsupported fields'):
+        load_activation_context(_write(tmp_path / 'activation.json', appdock_activation_payload))
+
+
+def test_load_activation_context_requires_current_workspace_fields(
+    tmp_path: Path,
+    appdock_activation_payload: dict,
+) -> None:
+    appdock_activation_payload['workspace'].pop('user_workspace_root')
+
+    with pytest.raises(AppConfigError, match='misses user_workspace_root'):
+        load_activation_context(_write(tmp_path / 'activation.json', appdock_activation_payload))
+
+
+def test_load_activation_context_rejects_invalid_runtime_package_digest(
+    tmp_path: Path,
+    appdock_activation_payload: dict,
+) -> None:
+    appdock_activation_payload['runtime_packages'][0]['payload_digest'] = 'bad'
+
+    with pytest.raises(AppConfigError, match='SHA-256'):
+        load_activation_context(_write(tmp_path / 'activation.json', appdock_activation_payload))

@@ -1,35 +1,130 @@
 {
-  "contract_version": "1.0",
+  "contract_version": "3.0",
   "identity": {
     "world_id": "stratbox",
-    "world_name": "Strategy Box"
+    "world_name": "Strategy Box",
+    "world_version": "0.1.0",
+    "world_description": "Windows desktop world for Strategy Box analytical workflows."
   },
   "world_definition": {
-    "data_profile": "data_enabled",
-    "sources": [
-      {
-        "source_ref": "https://github.com/ForestTiger-GH/stratbox.git",
-        "source_location_profile": "source_location_remote",
-        "source_packaging_profile": "source_packaging_installable",
-        "display_name": "Strategy Box Core",
-        "mount_id": "stratbox"
-      }
-    ]
+    "data_profile": "data_enabled"
   },
+  "source_requirements": [
+    {
+      "source_id": "stratbox_core_source",
+      "source_ref": "https://github.com/ForestTiger-GH/stratbox.git",
+      "display_name": "Strategy Box Core",
+      "access": {
+        "transport": "any",
+        "authentication": "anonymous_allowed",
+        "tls_trust": "system_trust",
+        "ssh_trust": "not_applicable"
+      },
+      "materialization": {
+        "lfs": "optional",
+        "submodules": "optional",
+        "history": "shallow_allowed",
+        "clone_strategy": "checkout"
+      }
+    }
+  ],
+  "package_declarations": [
+    {
+      "package_ref": "stratbox_windows_package",
+      "source_id": "manifest_source",
+      "package_identity": {
+        "package_id": "stratbox-windows",
+        "package_version": "0.1.0"
+      },
+      "package_profile": "package_python_project",
+      "content_root": "."
+    },
+    {
+      "package_ref": "stratbox_core_package",
+      "source_id": "stratbox_core_source",
+      "package_identity": {
+        "package_id": "stratbox",
+        "package_version": "0.2.1"
+      },
+      "package_profile": "package_python_project",
+      "content_root": "."
+    }
+  ],
+  "runtime_bindings": [
+    {
+      "binding_id": "stratbox-core-python",
+      "package_ref": "stratbox_core_package",
+      "binding_profile": "runtime_binding_python_distribution",
+      "specification": {},
+      "required_by_surface_ids": [
+        "desktop"
+      ],
+      "environment_id": "world"
+    },
+    {
+      "binding_id": "stratbox-windows-python",
+      "package_ref": "stratbox_windows_package",
+      "binding_profile": "runtime_binding_python_distribution",
+      "specification": {},
+      "required_by_surface_ids": [
+        "desktop"
+      ],
+      "depends_on": [
+        "stratbox-core-python"
+      ],
+      "environment_id": "world"
+    }
+  ],
   "default_surface_id": "desktop",
   "surfaces": [
     {
       "surface_id": "desktop",
       "display_name": "Strategy Box",
+      "surface_role": "interactive",
+      "entry_view": "scenario_chat",
+      "declared_views": [
+        "scenario_chat",
+        "workspace"
+      ],
       "activation": {
-        "kind": "python_module",
-        "target": "stratbox_windows.adapters.appdock.entry",
+        "contract_version": "4.0",
+        "entrypoint": {
+          "kind": "python_module",
+          "target": "stratbox_windows.adapters.appdock.entry",
+          "target_binding_id": "stratbox-windows-python",
+          "cwd_policy": {
+            "root_kind": "package",
+            "binding_id": "stratbox-windows-python",
+            "relative_path": "."
+          },
+          "env_policy": {
+            "mode": "sanitized"
+          },
+          "platform_constraints": {
+            "node_platforms": [
+              "windows"
+            ]
+          }
+        },
         "diagnostics": {
-          "strategy": "flag",
-          "flag": "--diagnose",
+          "strategy": "same_entrypoint_with_args",
+          "args": [
+            "--diagnose"
+          ],
           "timeout_seconds": 30
-        }
-      }
+        },
+        "launch_mode": "foreground",
+        "locality": "local"
+      },
+      "supports_artifacts": true,
+      "supports_presence": true
     }
-  ]
+  ],
+  "capabilities": {
+    "supports_artifacts": true,
+    "supports_presence": true
+  },
+  "requirements": {},
+  "hooks": {},
+  "extensions": {}
 }

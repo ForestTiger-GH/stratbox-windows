@@ -39,7 +39,6 @@ class AppPaths:
     active_session_path: Path | None = None
     health_snapshot_path: Path | None = None
     runtime_state_path: Path | None = None
-    cleanup_registry_path: Path | None = None
     package_root: Path | None = None
     dev_root: Path | None = None
 
@@ -102,7 +101,6 @@ def _build_appdock_managed_paths(
     active_session_path = Path(appdock_activation.refs.active_session_ref).expanduser() if appdock_activation.refs.active_session_ref else None
     health_snapshot_path = Path(appdock_activation.refs.health_snapshot_ref).expanduser() if appdock_activation.refs.health_snapshot_ref else None
     runtime_state_path = Path(appdock_activation.refs.runtime_state_ref).expanduser() if appdock_activation.refs.runtime_state_ref else None
-    cleanup_registry_path = Path(appdock_activation.refs.cleanup_registry_ref).expanduser() if appdock_activation.refs.cleanup_registry_ref else None
 
     return AppPaths(
         product_root=product_root,
@@ -128,7 +126,6 @@ def _build_appdock_managed_paths(
         active_session_path=active_session_path,
         health_snapshot_path=health_snapshot_path,
         runtime_state_path=runtime_state_path,
-        cleanup_registry_path=cleanup_registry_path,
         package_root=package_root,
     )
 
@@ -203,7 +200,7 @@ def build_app_paths(
     appdock_config_path: Path | None = None,
     standalone_dev_root: Path | None = None,
 ) -> AppPaths:
-    product_root = Path(appdock_activation.workspace.primary_root).expanduser() if appdock_activation is not None else _detect_product_root()
+    product_root = Path(appdock_activation.workspace.source_root).expanduser() if appdock_activation is not None else _detect_product_root()
     src_dir = product_root / 'src'
     if appdock_activation is not None:
         return _build_appdock_managed_paths(

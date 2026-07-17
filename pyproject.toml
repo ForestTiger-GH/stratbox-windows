@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Strategy Box Windows desktop surface for AppDock-managed analytical work."
 requires-python = ">=3.10"
 dependencies = [
-  "stratbox>=0.2.1",
+  "stratbox==0.2.1",
   "PySide6>=6.6",
 ]
 

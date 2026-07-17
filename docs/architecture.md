@@ -82,10 +82,12 @@ Boundary к desktop host:
 ### AppDock boundary vocabulary
 Это внешний контракт, который приходит от AppDock:
 
-- `workspace.primary_root`
+- `workspace.source_root`
+- `workspace.user_workspace_root`
 - `workspace.package_root`
 - `workspace.install_root`
 - `workspace.system_root`
+- `runtime_packages`
 
 Этот словарь живёт в `adapters/appdock` и не должен расползаться как канонический по всему runtime.
 

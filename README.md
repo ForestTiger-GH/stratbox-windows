@@ -1,19 +1,20 @@
 # Strategy Box Windows
 
-Strategy Box Windows — основной Windows desktop surface для запуска Strategy Box поверх AppDock-managed рабочей среды.
+Strategy Box Windows — основной Windows desktop surface для запуска Strategy Box в AppDock-managed рабочей среде.
 
 Репозиторий содержит:
 - конечный desktop surface продукта;
-- минимальный AppDock connector;
+- AppDock Connector Manifest `3.0`;
+- строгий адаптер Activation Context `3.0`;
 - runtime/application/presentation слои Windows-приложения.
 
-Библиотечное ядро `stratbox` внутрь репозитория не встраивается. Для AppDock product mode оно подключается как **дополнительный package source** с бизнес-логикой.
+Библиотечное ядро `stratbox` остаётся отдельным репозиторием. В AppDock product mode оно объявляется как обязательный secondary source, материализуется как отдельный Python project package и устанавливается в тот же managed environment раньше `stratbox-windows`.
 
 ## Что внутри
 
 - `src/stratbox_windows/application` — прикладная логика surface: сценарии, кейсы, логи, артефакты, фоновые процессы, поручения.
 - `src/stratbox_windows/runtime` — runtime-композиция приложения.
-- `src/stratbox_windows/adapters/appdock` — AppDock boundary.
+- `src/stratbox_windows/adapters/appdock` — строгая граница AppDock Connector/Activation Context.
 - `src/stratbox_windows/adapters/desktop_host` — desktop-host adapter.
 - `src/stratbox_windows/presentation/common` — общие presentation-модели.
 - `src/stratbox_windows/presentation/qt_desktop` — конкретная Qt desktop-реализация.
@@ -41,30 +42,34 @@ python -m stratbox_windows --standalone-dev-root ./.tmp/dev-workspace --diagnose
 
 ## AppDock product mode
 
-`appdock/manifest.json` является единственной repo-local декларацией Strategy Box. Он фиксирует минимум:
+`appdock/manifest.json` является единственной repo-local декларацией Strategy Box. Connector `3.0` фиксирует:
 
-- `world_id = stratbox`;
-- имя мира `Strategy Box`;
+- `world_id = stratbox` и имя мира `Strategy Box`;
 - desktop surface `desktop`;
-- AppDock entrypoint;
-- включённый Data sector;
-- auxiliary source `stratbox`.
+- Activation contract `4.0` и entrypoint `stratbox_windows.adapters.appdock.entry`;
+- включённый Data sector без заранее выбранного locator/binding;
+- secondary source `stratbox`;
+- package declarations для `stratbox` и `stratbox-windows`;
+- dependency-ordered bindings `runtime_binding_python_distribution` в едином environment `world`.
+
+AppDock materialize-ит оба source package, создаёт managed Python environment, устанавливает сначала `stratbox`, затем `stratbox-windows`, после чего запускает surface через Activation Context `3.0`.
+
+Временный механизм `activation_context.package_mounts` удалён. Импорт `stratbox` должен обеспечиваться штатной установкой runtime binding, а не изменением `sys.path` в entrypoint.
 
 Параметры установки, обновления, размещения Data, оформления и входа выбираются в AppDock Studio. Отдельный `appdock/preset.json` отсутствует.
-
-До появления штатной установки auxiliary Python package entrypoint подхватывает materialized source `stratbox` из `activation_context.package_mounts`.
 
 ## Документация
 
 - `docs/architecture.md` — архитектурная карта репозитория и границы слоёв.
 - `docs/development.md` — локальная разработка, установка зависимостей и проверка запуска.
-- `docs/appdock-integration.md` — связка с AppDock product mode и package-source модель.
+- `docs/appdock-integration.md` — Connector `3.0`, package graph и Activation Context `3.0`.
 
 ## Минимальные проверки
 
 ```bash
 python scripts/check_release_integrity.py
 python scripts/check_internal_imports.py
+python scripts/check_appdock_contract.py --appdock-repository ../AppDock
 python -m pytest
 ```
 

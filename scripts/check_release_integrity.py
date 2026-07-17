@@ -11,7 +11,10 @@ REQUIRED_FILES = [
     'docs/architecture.md',
     'docs/development.md',
     'docs/appdock-integration.md',
+    'scripts/check_appdock_contract.py',
     'tests/contracts/test_runtime_contracts.py',
+    'tests/contracts/test_appdock_entry.py',
+    'tests/smoke/test_repository_contract.py',
     'tests/smoke/test_external_core_dependency.py',
     'tests/unit/test_paths.py',
     'src/stratbox_windows/application/logs/__init__.py',
@@ -29,6 +32,8 @@ CHECK_IGNORE_PATHS = [
     'src/stratbox_windows/application/logs/models.py',
     'src/stratbox_windows/application/history/persistence.py',
     'tests/contracts/test_runtime_contracts.py',
+    'tests/contracts/test_appdock_entry.py',
+    'tests/smoke/test_repository_contract.py',
 ]
 
 
